@@ -60,6 +60,11 @@ python3 -m http.server 8231
 files **by filename** — no scene edits, per plan §11. Both are excluded from the
 export along with the rest of `tools/`.
 
+The per-file checklist for that swap — every art and audio asset, its size, how
+it is drawn, and which ones have constraints mirrored in code — is
+[ASSETS_TODO.md](ASSETS_TODO.md). Claim rows there before you start drawing.
+Don't re-run the generators once real assets land; they overwrite by filename.
+
 ---
 
 ## Controls
