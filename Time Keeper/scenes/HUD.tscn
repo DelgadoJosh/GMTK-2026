@@ -1,0 +1,75 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/panel_bg.png" id="2_panel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hud"]
+texture = ExtResource("2_panel")
+texture_margin_left = 24.0
+texture_margin_top = 24.0
+texture_margin_right = 24.0
+texture_margin_bottom = 24.0
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[node name="HUD" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_hud")
+script = ExtResource("1_script")
+
+[node name="Bar" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="Brand" type="Label" parent="Bar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.78, 0.62, 0.29, 1)
+theme_override_font_sizes/font_size = 18
+text = "GAME JAM"
+vertical_alignment = 1
+
+[node name="Phase" type="Label" parent="Bar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "ORIENTATION"
+vertical_alignment = 1
+
+[node name="Shift" type="Label" parent="Bar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "SHIFT  00:00"
+vertical_alignment = 1
+
+[node name="Dividend" type="Label" parent="Bar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.62, 0.86, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "SWITCHED!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Hearts" type="HBoxContainer" parent="Bar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 2
+
+[node name="Score" type="Label" parent="Bar"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1

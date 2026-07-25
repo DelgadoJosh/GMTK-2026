@@ -1,0 +1,88 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_frame.png" id="2_frame"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.06, 0.07, 0.09, 1)
+
+[node name="MainMenu" type="PanelContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+script = ExtResource("1_script")
+
+[node name="Watermark" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.06)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Center/Stack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.62, 0.29, 1)
+theme_override_font_sizes/font_size = 52
+text = "TIME KEEPER"
+horizontal_alignment = 1
+
+[node name="Acronym" type="Label" parent="Center/Stack"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = ""
+horizontal_alignment = 1
+
+[node name="Expansion" type="Label" parent="Center/Stack"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.86, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Pitch" type="Label" parent="Center/Stack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.71, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Keep every countdown in the facility from reaching zero.
+All of them. At the same time. Forever.
+Three mistakes and you're fired."
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Center/Stack"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Play" type="Button" parent="Center/Stack/Buttons"]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+text = "Clock in"
+
+[node name="Quit" type="Button" parent="Center/Stack/Buttons"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "Clock out"
+
+[node name="Hint" type="Label" parent="Center/Stack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.44, 0.52, 1)
+theme_override_font_sizes/font_size = 12
+text = "Debug panel: ` or F1"
+horizontal_alignment = 1

@@ -1,0 +1,68 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/EasterEggDialog.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
+bg_color = Color(0.1, 0.11, 0.14, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.78, 0.62, 0.29, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="EasterEggDialog" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="Stack" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Message" type="Label" parent="Center/Panel/Margin/Stack"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "You found an easter egg!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Center/Panel/Margin/Stack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "Every countdown is paused while you read this. You're welcome."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Close" type="Button" parent="Center/Panel/Margin/Stack"]
+layout_mode = 2
+text = "Back to work"

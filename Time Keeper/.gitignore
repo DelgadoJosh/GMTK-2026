@@ -1,0 +1,6 @@
+# Godot's import cache and generated metadata. Rebuilt on first open.
+.godot/
+
+# Local editor state.
+*.translation
+export_presets.cfg.local

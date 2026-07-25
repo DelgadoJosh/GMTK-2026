@@ -1,0 +1,193 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/stations/SafeStation.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/panel_bg.png" id="2_panel"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/panel_locked.png" id="3_locked"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/safe_lcd.png" id="4_lcd"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/safe_door.png" id="5_door"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/codex_page.png" id="6_codex"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shell"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_codex"]
+texture = ExtResource("6_codex")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[node name="SafeStation" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_shell")
+script = ExtResource("1_script")
+station_id = "safe"
+display_name = "Safe Keypad"
+base_duration = 18.0
+floor_duration = 7.0
+unlock_time = 60.0
+grace_duration = 0.0
+lockout_duration = 2.0
+
+[node name="Background" type="NinePatchRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_panel")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="Layout" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Stack" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Layout/Stack"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "SAFE KEYPAD"
+
+[node name="Body" type="Control" parent="Layout/Stack"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Console" type="VBoxContainer" parent="Layout/Stack/Body"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.66
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Lcd" type="TextureRect" parent="Layout/Stack/Body/Console"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_lcd")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Value" type="Label" parent="Layout/Stack/Body/Console/Lcd"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.55, 0.95, 0.65, 1)
+theme_override_font_sizes/font_size = 15
+text = "_ _ _ _ _ _ _ _ _ _"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Keypad" type="GridContainer" parent="Layout/Stack/Body/Console"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+columns = 3
+
+[node name="Codex" type="PanelContainer" parent="Layout/Stack/Body"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.69
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_codex")
+
+[node name="Margin" type="MarginContainer" parent="Layout/Stack/Body/Codex"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="GridContainer" parent="Layout/Stack/Body/Codex/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 2
+columns = 2
+
+[node name="Door" type="TextureRect" parent="Layout/Stack/Body"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_door")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Status" type="Label" parent="Layout/Stack"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "RE-LOCK"
+
+[node name="Bar" type="ProgressBar" parent="Layout/Stack"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+mouse_filter = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="LockedOverlay" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Board" type="NinePatchRect" parent="LockedOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_locked")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="LockedLabel" type="Label" parent="LockedOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+text = "NOT YOUR PROBLEM (YET)"
+horizontal_alignment = 1
+vertical_alignment = 1

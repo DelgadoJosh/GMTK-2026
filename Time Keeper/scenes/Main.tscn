@@ -1,0 +1,176 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://scenes/stations/HourglassStation.tscn" id="3_hourglass"]
+[ext_resource type="PackedScene" path="res://scenes/stations/ClockStation.tscn" id="4_clock"]
+[ext_resource type="PackedScene" path="res://scenes/stations/SafeStation.tscn" id="5_safe"]
+[ext_resource type="PackedScene" path="res://scenes/stations/RocketStation.tscn" id="6_rocket"]
+[ext_resource type="PackedScene" path="res://scenes/DebugPanel.tscn" id="7_debug"]
+[ext_resource type="PackedScene" path="res://scenes/EasterEggDialog.tscn" id="8_egg"]
+[ext_resource type="PackedScene" path="res://scenes/GameOver.tscn" id="9_over"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/vignette.png" id="10_vignette"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.055, 0.065, 0.085, 1)
+
+[node name="Root" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="HUD" parent="Root" instance=ExtResource("2_hud")]
+layout_mode = 2
+
+[node name="StationGrid" type="GridContainer" parent="Root"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="HourglassStation" parent="Root/StationGrid" instance=ExtResource("3_hourglass")]
+layout_mode = 2
+
+[node name="ClockStation" parent="Root/StationGrid" instance=ExtResource("4_clock")]
+layout_mode = 2
+
+[node name="SafeStation" parent="Root/StationGrid" instance=ExtResource("5_safe")]
+layout_mode = 2
+
+[node name="RocketStation" parent="Root/StationGrid" instance=ExtResource("6_rocket")]
+layout_mode = 2
+
+[node name="Overlays" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DividendPulse" type="TextureRect" parent="Overlays"]
+modulate = Color(0.72, 0.86, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_vignette")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="MistakeVignette" type="TextureRect" parent="Overlays"]
+modulate = Color(0.85, 0.18, 0.16, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_vignette")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="MistakeStamp" type="Label" parent="Overlays"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -46.0
+offset_right = 220.0
+offset_bottom = 46.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(220, 46)
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.24, 0.22, 1)
+theme_override_font_sizes/font_size = 64
+text = "MISTAKE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseOverlay" type="ColorRect" parent="Overlays"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.88)
+
+[node name="PausedLabel" type="Label" parent="Overlays/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 34
+text = "SHIFT PAUSED
+(the facility waits for you)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugPanel" parent="." instance=ExtResource("7_debug")]
+visible = false
+
+[node name="DialogLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EasterEggDialog" parent="DialogLayer" instance=ExtResource("8_egg")]
+visible = false
+
+[node name="GameOverLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="GameOver" parent="GameOverLayer" instance=ExtResource("9_over")]
+visible = false

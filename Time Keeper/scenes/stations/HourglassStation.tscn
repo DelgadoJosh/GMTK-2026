@@ -1,0 +1,155 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/stations/HourglassStation.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/panel_bg.png" id="2_panel"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/panel_locked.png" id="3_locked"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_frame.png" id="4_frame"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_sand.png" id="5_sand"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shell"]
+
+[node name="HourglassStation" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_shell")
+script = ExtResource("1_script")
+station_id = "hourglass"
+display_name = "Hourglass"
+base_duration = 14.0
+floor_duration = 5.0
+unlock_time = 0.0
+grace_duration = 1.5
+lockout_duration = 2.0
+
+[node name="Background" type="NinePatchRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_panel")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="Layout" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Stack" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Layout/Stack"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "HOURGLASS"
+
+[node name="Body" type="Control" parent="Layout/Stack"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Glass" type="Control" parent="Layout/Stack/Body"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopChamber" type="Control" parent="Layout/Stack/Body/Glass"]
+clip_contents = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Sand" type="TextureRect" parent="Layout/Stack/Body/Glass/TopChamber"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("5_sand")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="BottomChamber" type="Control" parent="Layout/Stack/Body/Glass"]
+clip_contents = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Sand" type="TextureRect" parent="Layout/Stack/Body/Glass/BottomChamber"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("5_sand")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Frame" type="TextureRect" parent="Layout/Stack/Body/Glass"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Status" type="Label" parent="Layout/Stack"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "SAND"
+
+[node name="Bar" type="ProgressBar" parent="Layout/Stack"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+mouse_filter = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="LockedOverlay" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Board" type="NinePatchRect" parent="LockedOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_locked")
+patch_margin_left = 24
+patch_margin_top = 24
+patch_margin_right = 24
+patch_margin_bottom = 24
+
+[node name="LockedLabel" type="Label" parent="LockedOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+text = "NOT YOUR PROBLEM (YET)"
+horizontal_alignment = 1
+vertical_alignment = 1
