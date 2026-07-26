@@ -46,7 +46,9 @@ Torpedo launch.wav by jobro -- https://freesound.org/s/35531/ -- License: Attrib
 
 misslyckad bana v5.wav by simon.rue -- https://freesound.org/s/49948/ -- License: Creative Commons 0
 
-tang1.wav by escortmarius -- https://freesound.org/s/138096/ -- License: Creative Commons 0"
+tang1.wav by escortmarius -- https://freesound.org/s/138096/ -- License: Creative Commons 0
+
+Metal Ping 3.wav by JarredGibb -- https://freesound.org/s/217461/ -- License: Creative Commons 0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
