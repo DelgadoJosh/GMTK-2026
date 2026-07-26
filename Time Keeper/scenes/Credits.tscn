@@ -42,7 +42,11 @@ Wood Tumble by DiscordantScraps -- https://freesound.org/s/767432/ -- License: A
 
 Alert guitar.wav by ConBlast -- https://freesound.org/s/562997/ -- License: Creative Commons 0
 
-Torpedo launch.wav by jobro -- https://freesound.org/s/35531/ -- License: Attribution 3.0"
+Torpedo launch.wav by jobro -- https://freesound.org/s/35531/ -- License: Attribution 3.0
+
+misslyckad bana v5.wav by simon.rue -- https://freesound.org/s/49948/ -- License: Creative Commons 0
+
+tang1.wav by escortmarius -- https://freesound.org/s/138096/ -- License: Creative Commons 0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
