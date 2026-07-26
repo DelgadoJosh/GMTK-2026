@@ -1,4 +1,4 @@
-# Asset TODO — art & audio
+# Asset TODO — art, audio & text
 
 Every visual and every sound in the game right now is a **procedurally
 generated placeholder** (`tools/gen_placeholders.py`, `tools/gen_audio.py`).
@@ -7,6 +7,10 @@ Nothing here has been hand-made yet.
 This file is the checklist for replacing them. Put your name in the **Owner**
 column when you pick something up, tick the box when the final file is
 committed.
+
+> **Everything on this list is hand-made by a human — art, audio and every
+> word of text. No AI-generated assets, no AI-written copy.** See
+> [Text & dialog](#text--dialog) for what that means for the writing pass.
 
 ---
 
@@ -165,3 +169,57 @@ If we want music, someone needs to own both halves:
 Honest recommendation: the tick ladder *is* the soundtrack — it's how you read
 the board without looking. Music is a stretch goal, and a bad music bed would
 actively hurt the game. Do the SFX pass first.
+
+---
+
+# Text & dialog
+
+**Every player-facing word in this game is hand-written by a human. Nothing
+here is AI-generated, and nothing here gets AI-generated later.** That covers
+station labels, button text, the fail screen, the menu gag, the easter-egg
+dialog, the rocket word list — all of it. If a line needs rewriting, a person
+rewrites it.
+
+Practical reasons, not just principle:
+
+- The jam's voice is the joke. The comedy is in specific, deliberate word
+  choices ("NOT YOUR PROBLEM (YET)", "You were fired by:") and generated
+  filler flattens exactly that.
+- Judges read this copy. It is the most-seen "asset" in the game — every
+  string is on screen for the whole run, unlike any single sprite.
+- Several strings are load-bearing (see the ⚠ rows below); a rewrite that
+  ignores the constraint breaks layout or gameplay, not just tone.
+
+**If you take a writing pass:** rewrite in your own words, keep the length
+budget, and note yourself in the Owner column. Don't paste in generated
+alternatives "just to compare" — it contaminates the pass.
+
+### Where the text actually lives
+
+Unlike art and audio there is no assets folder — strings are inline in scenes
+and scripts. This is the full map.
+
+| ☐ | Where | What's in it | Notes | Owner |
+|---|---|---|---|---|
+| ☐ | `scenes/MainMenu.tscn` | Title, the one-paragraph pitch, "Clock in" / "Clock out", the debug hint | The pitch line is the only place the game explains itself. ⚠ Keep it short enough to not push the buttons off a 1280×720 layout. | |
+| ☐ | `scripts/MainMenu.gd` → `GAG` | The GMTK / GAME JAM acronym gag that types itself out letter by letter | Two entries today. ⚠ Each letter costs `LETTER_DELAY` (0.09s) plus a `HOLD` of 1.1s, so a long acronym stalls the menu — and the expansion is drawn on one label, so watch the line breaks. Best spot in the game for more jokes; add entries, don't replace the mechanic. | |
+| ☐ | `scenes/stations/*.tscn` | Station titles (`HOURGLASS`, `WIND-UP CLOCK`, `SAFE KEYPAD`, `ROCKET LAUNCH`), gauge captions (`SAND`, `TENSION`), `RE-LOCK`, the rocket's `Click the box, type the word, press Enter.` | ⚠ These sit inside the panel body — a longer title will clip at ~624×319 per station. Check all four at once in the layout screenshot. | |
+| ☐ | `scenes/stations/*.tscn` | `NOT YOUR PROBLEM (YET)` — the locked-station cover, 3 copies | ⚠ Drawn over `panel_locked.png`; change it in all three scenes or the stations disagree with each other. | |
+| ☐ | `scripts/stations/RocketStation.gd` → `WORDS` | The launch countdown the player types: `ten … one`, `we have liftoff` | ⚠ **Gameplay, not flavour.** These get typed under time pressure — keep them short, unambiguous, and easy to spell. `next_label` upper-cases them. Length changes difficulty. | |
+| ☐ | `scripts/stations/RocketStation.gd` | Console status lines: `NO LAUNCH SCHEDULED`, `standing by`, `standing by  (click to focus)`, `SAY: %s   (%d/%d)` | ⚠ BBCode with baked colour constants (`COLOR_TYPED` etc.) — edit the words, leave the tags. | |
+| ☐ | `scripts/ConsoleWords.gd` → `WORDS` | Console/cheat words: `easter egg`, `cheat` | ⚠ Matched lowercase and trimmed. The docstring already lists candidates (`gmtk`, `fired`, `timekeeper`, `overtime`) — adding one is a one-line change. | |
+| ☐ | `scenes/EasterEggDialog.tscn` + `EasterEggDialog.gd` | `You found an easter egg!`, `Every countdown is paused while you read this. You're welcome.`, `Back to work` | The default message is duplicated as a fallback arg in `EasterEggDialog.gd:18` — change both. This is the reward for curiosity; it should be worth finding. | |
+| ☐ | `scenes/HUD.tscn` + `scripts/HUD.gd` | `SHIFT  00:00`, `SWITCHED!  +TIME  (%s)`, the `GAME JAM` / `ORIENTATION` header | ⚠ On screen the entire run. The dividend banner is the only positive feedback text in the game — make it feel like a reward. | |
+| ☐ | `scenes/GameOver.tscn` + `scripts/GameOver.gd` | `YOU'RE FIRED`, `SHIFT SURVIVED`, `SERVICE POINTS`, `You were fired by: %s`, the per-station breakdown, `CHEATED -- not eligible for the high score`, `Another shift` / `Main menu` | ⚠ `STATION_NAMES` maps ids to display names, with the fallback `nobody, somehow`. The breakdown uses `%-14s` padding — a longer station name breaks the column alignment. Last screen a judge sees; worth the most polish per word. | |
+| ☐ | `scenes/Main.tscn` | `MISTAKE` flash, the `SHIFT PAUSED` overlay | | |
+| ☐ | `README.md` / itch.io page copy | Description, controls, credits | Not in-game, but it's the pitch. Same rule — hand-written. | |
+
+`scripts/DebugPanel.gd` is dev-only and never shipped to a player, so its
+strings don't need a writing pass.
+
+### Also worth a human eye
+
+| ☐ | Item | Notes | Owner |
+|---|---|---|---|
+| ☐ | **Tone pass across all four stations** | Read every string in one sitting. Right now the voice drifts between dry-corporate (`NOT YOUR PROBLEM (YET)`) and jokey (`You're welcome.`). Pick one and commit. | |
+| ☐ | **Character coverage check** | Do this *after* the bitmap font lands (§6). Any em dash, curly quote or symbol a hand-written line introduces has to exist in the font, or it renders as a box. | |
