@@ -38,7 +38,9 @@ Nokia Keypad Beep.wav by edinc90 -- https://freesound.org/s/268917/ -- License: 
 
 Success by Sjonas88 -- https://freesound.org/s/538554/ -- License: Creative Commons 0
 
-Wood Tumble by DiscordantScraps -- https://freesound.org/s/767432/ -- License: Attribution 4.0"
+Wood Tumble by DiscordantScraps -- https://freesound.org/s/767432/ -- License: Attribution 4.0
+
+Alert guitar.wav by ConBlast -- https://freesound.org/s/562997/ -- License: Creative Commons 0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
