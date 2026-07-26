@@ -23,6 +23,11 @@ const MIX_DB := {
 	# A klaxon that makes you flinch stops being information and starts being a
 	# reason to mute the tab.
 	"klaxon": -12.0,
+	# tick.wav peaks at -15.6dB where the rest of the pack sits at 0 to -1dB, so
+	# it arrives roughly 15dB down before the urgency ladder has even attenuated
+	# it. This trim puts it back in line with everything else; it is calibrated
+	# to that specific file, so re-measure if the tick is swapped again.
+	"tick": 12.0,
 }
 
 ## Tick pitch per station, low to high in unlock order.
@@ -100,6 +105,9 @@ func _process(delta: float) -> void:
 		if elapsed >= interval:
 			elapsed = 0.0
 			var pitch: float = float(TICK_PITCH.get(station_id, 1.0))
-			# Quiet when merely warning, insistent when critical.
-			play("tick", pitch, lerpf(-14.0, -3.0, t))
+			# Quiet when merely warning, insistent when critical -- but the old
+			# -14dB floor put a warning tick so far under the rest of the mix
+			# that it read as absent rather than as calm. The ladder still
+			# climbs; it just starts somewhere you can hear.
+			play("tick", pitch, lerpf(-10.0, -1.0, t))
 		_tick_timers[station_id] = elapsed

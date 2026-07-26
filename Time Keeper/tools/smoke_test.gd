@@ -45,6 +45,7 @@ func _ready() -> void:
 	await _test_how_to_play()
 	await _test_credits()
 	_test_title_gag()
+	_test_audio_mix()
 
 	print("")
 	print("%d checks, %d failures" % [_checks, _failures])
@@ -704,3 +705,23 @@ func _test_title_gag() -> void:
 		if prefixes.is_empty() or prefixes[prefixes.size() - 1] != str(entry["expansion"]):
 			intact = false
 	check(intact, "every gag ends on its complete expansion")
+
+
+func _test_audio_mix() -> void:
+	print("\n-- audio mix")
+	# Per-sound trim is the whole reason a swapped-in file can be rebalanced in
+	# one place. If play() stops applying it, every level in the game is wrong
+	# at once and nothing else would catch it.
+	var voice: int = Sfx._next_voice
+	Sfx.play("tick", 1.0, -10.0)
+	check(is_equal_approx(Sfx._pool[voice].volume_db,
+		-10.0 + float(Sfx.MIX_DB["tick"])),
+		"per-sound trim is added to the volume the caller asked for")
+
+	voice = Sfx._next_voice
+	Sfx.play("flip", 1.0, -4.0)
+	check(is_equal_approx(Sfx._pool[voice].volume_db, -4.0),
+		"a sound with no trim entry is left exactly as asked")
+
+	check(float(Sfx.MIX_DB["tick"]) > 0.0 and float(Sfx.MIX_DB["klaxon"]) < 0.0,
+		"the tick is lifted and the klaxon is cut")

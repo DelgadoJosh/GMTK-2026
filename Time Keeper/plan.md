@@ -453,7 +453,10 @@ Jam rules require assets made during the jam, so swapping must be mechanical.
   ```
 - One bitmap/pixel font everywhere, swapped once.
 - Audio, same swap-by-filename rule: `tick`, `flip`, `wind`, `snap`, `keypad_beep`, `keypad_shuffle`, `safe_open`, `launch`, `dividend`, `mistake`, `fired`.
-- **Per-sound trim lives in `Sfx.MIX_DB`**, not at the call sites. How loud a sound sits against the rest is a property of the file, so a swapped-in replacement gets rebalanced in one place instead of everywhere it is played. The klaxon runs at **−12dB**: one that makes you flinch stops being information and starts being a reason to mute the tab.
+- **Per-sound trim lives in `Sfx.MIX_DB`**, not at the call sites. How loud a sound sits against the rest is a property of the file, so a swapped-in replacement gets rebalanced in one place instead of everywhere it is played.
+  - `klaxon` **−12dB**: one that makes you flinch stops being information and starts being a reason to mute the tab.
+  - `tick` **+12dB**: the handmade tick peaks at −15.6dB where the rest of the pack sits at 0 to −1dB, so it arrived ~15dB down before the urgency ladder attenuated it further. **These trims are calibrated per file — re-measure after a swap** rather than assuming they still hold.
+- The urgency ladder runs **−10dB → −1dB** across the warning-to-critical span. The old −14dB floor put a warning tick so far under the mix that it read as absent rather than as calm.
 
 ---
 
