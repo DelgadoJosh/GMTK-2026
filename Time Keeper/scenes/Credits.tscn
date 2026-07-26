@@ -52,7 +52,15 @@ Metal Ping 3.wav by JarredGibb -- https://freesound.org/s/217461/ -- License: Cr
 
 LushLife_LevelUp.wav by SimonBay -- https://freesound.org/s/439889/ -- License: Attribution 3.0
 
-Jingle_Achievement_00.wav by LittleRobotSoundFactory -- https://freesound.org/s/270468/ -- License: Attribution 4.0"
+Jingle_Achievement_00.wav by LittleRobotSoundFactory -- https://freesound.org/s/270468/ -- License: Attribution 4.0
+
+Card Shuffle Mechanism by jackyyang09 -- https://freesound.org/s/671917/ -- License: Creative Commons 0
+
+Winchester 1873, cock and dry fire.wav by SpliceSound -- https://freesound.org/s/218319/ -- License: Creative Commons 0
+
+playing_cards.aif by KevinHilt -- https://freesound.org/s/196541/ -- License: Creative Commons 0
+
+cardshuffler.wav by j1987 -- https://freesound.org/s/123005/ -- License: Creative Commons 0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
