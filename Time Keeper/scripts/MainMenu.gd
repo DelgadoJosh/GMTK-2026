@@ -24,13 +24,14 @@ var _gag_index: int = 0
 @onready var quit_button: Button = $Center/Stack/Buttons/Quit
 @onready var veteran_check: CheckButton = $Center/Stack/Veteran
 @onready var howto_button: Button = $Center/Stack/Buttons/HowTo
-@onready var howto_panel: Control = $HowToPlay
+@onready var howto_panel: InfoPanel = $HowToPlay
+@onready var credits_button: Button = $Center/Stack/Buttons/CreditsButton
+@onready var credits_panel: InfoPanel = $Credits
 
 
 func _ready() -> void:
-	howto_button.pressed.connect(func() -> void:
-		Sfx.play("click")
-		howto_panel.open())
+	_wire_panel(howto_button, howto_panel)
+	_wire_panel(credits_button, credits_panel)
 	# The autoload outlives this scene, so the box remembers the last choice
 	# when you come back to the title after being fired.
 	veteran_check.button_pressed = \
@@ -41,6 +42,14 @@ func _ready() -> void:
 	quit_button.visible = OS.get_name() != "Web"
 	play_button.grab_focus()
 	_run_gag()
+
+
+## Both reading panels behave identically: open on click, and hand focus back to
+## the button that opened them on close, so the keyboard never ends up nowhere.
+func _wire_panel(button: Button, panel: InfoPanel) -> void:
+	button.pressed.connect(func() -> void:
+		Sfx.play("click")
+		panel.open())
 
 
 func _run_gag() -> void:

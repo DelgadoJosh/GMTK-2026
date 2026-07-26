@@ -1,59 +1,14 @@
-extends PanelContainer
+extends InfoPanel
 ## The rules panel, opened from the title card.
 ##
 ## Every number in here is read off the constant that actually drives it, so the
 ## instructions cannot quietly start lying after a balance pass. If a value below
 ## looks wrong, the fix is in the station, not in this file.
 
-signal closed
-
 const HOURGLASS := preload("res://scripts/stations/HourglassStation.gd")
 const CLOCK := preload("res://scripts/stations/ClockStation.gd")
 const SAFE := preload("res://scripts/stations/SafeStation.gd")
 const ROCKET := preload("res://scripts/stations/RocketStation.gd")
-
-const GOLD := "c79e4a"
-const DIM := "8d93a1"
-const GREEN := "5cbf6b"
-const AMBER := "ebad33"
-const RED := "d93d38"
-
-var _focus_before: Control = null
-
-@onready var body: RichTextLabel = $Center/Panel/Margin/Stack/Scroll/Body
-@onready var close_button: Button = $Center/Panel/Margin/Stack/Close
-
-
-func _ready() -> void:
-	close_button.pressed.connect(close)
-	body.text = _build()
-	visible = false
-
-
-func open() -> void:
-	if visible:
-		return
-	visible = true
-	$Center/Panel/Margin/Stack/Scroll.scroll_vertical = 0
-	_focus_before = get_viewport().gui_get_focus_owner()
-	close_button.grab_focus()
-
-
-func close() -> void:
-	if not visible:
-		return
-	visible = false
-	Sfx.play("click")
-	if is_instance_valid(_focus_before):
-		_focus_before.grab_focus()
-	_focus_before = null
-	closed.emit()
-
-
-func _input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
-		close()
-		get_viewport().set_input_as_handled()
 
 
 # --- content -----------------------------------------------------------------
@@ -142,10 +97,6 @@ func _build() -> String:
 		+ " stations back and forth.")
 
 	return "\n\n".join(out)
-
-
-func _heading(text: String) -> String:
-	return "[color=%s][b]%s[/b][/color]" % [GOLD, text]
 
 
 ## Station headings carry the input device as well as the name. Which hand a

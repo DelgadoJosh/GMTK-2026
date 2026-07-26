@@ -43,6 +43,7 @@ func _ready() -> void:
 	await _test_progression()
 	await _test_clock()
 	await _test_how_to_play()
+	await _test_credits()
 
 	print("")
 	print("%d checks, %d failures" % [_checks, _failures])
@@ -617,6 +618,32 @@ func _test_how_to_play() -> void:
 		"the anti-spam threshold reached the page")
 	check(text.contains("%ds" % int(Station.PROGRESS_TIME_BONUS)),
 		"the time bonus reached the page")
+
+	panel.queue_free()
+	await get_tree().process_frame
+
+
+func _test_credits() -> void:
+	print("\n-- credits")
+	var panel: Node = load("res://scenes/Credits.tscn").instantiate()
+	get_tree().root.add_child(panel)
+	await get_tree().process_frame
+	var text: String = panel.body.text
+	for name in ["4Penguins", "Game Maker's Toolkit", "Family", "GMTK Game Jam 2026"]:
+		check(text.contains(name), "credits name '%s' is on the page" % name)
+	check(text.contains("AUDIO"), "the audio section exists before anything fills it")
+
+	# Attributions are pasted verbatim and routinely contain brackets and
+	# quotes. Unescaped, a bracket is read as a BBCode tag and eats the rest of
+	# the panel -- so the escape is the one thing here that can actually break.
+	panel.audio_attribution = "\"Klaxon\" by RetroFoley\nCC BY 4.0 [example.org/by/4.0/]"
+	panel.body.text = panel._build()
+	text = panel.body.text
+	check(text.contains("RetroFoley"), "a pasted attribution reaches the page")
+	check(not text.contains("credited yet"),
+		"the placeholder gives way once an attribution exists")
+	check(text.contains("[lb]example.org/by/4.0/]"),
+		"brackets in a pasted licence are escaped, not parsed as BBCode")
 
 	panel.queue_free()
 	await get_tree().process_frame

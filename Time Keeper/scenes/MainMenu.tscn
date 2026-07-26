@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_frame.png" id="2_frame"]
 [ext_resource type="PackedScene" path="res://scenes/HowToPlay.tscn" id="3_howto"]
+[ext_resource type="PackedScene" path="res://scenes/Credits.tscn" id="4_credits"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.06, 0.07, 0.09, 1)
@@ -87,6 +88,11 @@ custom_minimum_size = Vector2(150, 44)
 layout_mode = 2
 text = "How to play"
 
+[node name="CreditsButton" type="Button" parent="Center/Stack/Buttons"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "Credits"
+
 [node name="Quit" type="Button" parent="Center/Stack/Buttons"]
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
@@ -100,5 +106,9 @@ text = "Debug panel: ` or F1"
 horizontal_alignment = 1
 
 [node name="HowToPlay" parent="." instance=ExtResource("3_howto")]
+visible = false
+layout_mode = 2
+
+[node name="Credits" parent="." instance=ExtResource("4_credits")]
 visible = false
 layout_mode = 2

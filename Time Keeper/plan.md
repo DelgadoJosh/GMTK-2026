@@ -270,9 +270,13 @@ Second hourglass is **dropped** (per decision on Q7) — the grid stays 2×2.
 
 ### Title card
 
-`Clock in` · `How to play` · `Clock out`, plus the **Veteran** checkbox.
+`Clock in` · `How to play` · `Credits` · `Clock out`, plus the **Veteran** checkbox.
 
-`How to play` opens a scrolling rules panel (`scenes/HowToPlay.tscn`) covering all four stations with the input device each one wants, the point value of each, the clutch and anti-spam rules, and what the Time Dividend is and why switching is the reward.
+Both reading panels share `InfoPanel` (`scripts/InfoPanel.gd`) — scrim, card, scrolling BBCode body, `Esc` to close, focus handed back to the button that opened it. A subclass overrides `_build()` and nothing else.
+
+**Credits** carries the team, the jam, and an `AUDIO` section whose text lives in an `@export_multiline` field on the Credits node rather than in the script. Licence text is pasted verbatim, routinely contains brackets, quotes and URLs, and should never need escaping into GDScript to add — paste it into the inspector. Anything pasted there is BBCode-escaped before it is drawn, because an unbalanced `[` would otherwise be read as a tag and swallow the rest of the panel. Until something is pasted the section shows a visible placeholder rather than silently reading as "no third-party audio used".
+
+**How to play** opens a scrolling rules panel (`scenes/HowToPlay.tscn`) covering all four stations with the input device each one wants, the point value of each, the clutch and anti-spam rules, and what the Time Dividend is and why switching is the reward.
 
 Its numbers are **read off the constants that drive them** — `HourglassStation.POINTS`, `ClockStation.OVERWIND_MIN`, `GameManager.CLUTCH_MULTIPLIER`, `Station.PROGRESS_TIME_BONUS` and so on — rather than typed in. A help screen that quietly disagrees with the game after a balance pass is worse than no help screen. The smoke test asserts every placeholder actually substituted, because GDScript binds `%` tighter than `+` and a concatenated format string without parentheses fails silently.
 
