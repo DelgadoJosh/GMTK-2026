@@ -50,7 +50,9 @@ tang1.wav by escortmarius -- https://freesound.org/s/138096/ -- License: Creativ
 
 Metal Ping 3.wav by JarredGibb -- https://freesound.org/s/217461/ -- License: Creative Commons 0
 
-LushLife_LevelUp.wav by SimonBay -- https://freesound.org/s/439889/ -- License: Attribution 3.0"
+LushLife_LevelUp.wav by SimonBay -- https://freesound.org/s/439889/ -- License: Attribution 3.0
+
+Jingle_Achievement_00.wav by LittleRobotSoundFactory -- https://freesound.org/s/270468/ -- License: Attribution 4.0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
