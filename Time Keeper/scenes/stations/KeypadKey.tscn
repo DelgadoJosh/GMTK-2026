@@ -5,6 +5,7 @@
 [node name="KeypadKey" type="TextureButton"]
 custom_minimum_size = Vector2(46, 40)
 layout_mode = 2
+focus_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 ignore_texture_size = true

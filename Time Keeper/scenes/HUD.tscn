@@ -58,6 +58,7 @@ theme_override_font_sizes/font_size = 15
 text = "SWITCHED!"
 horizontal_alignment = 1
 vertical_alignment = 1
+clip_text = true
 
 [node name="Hearts" type="HBoxContainer" parent="Bar"]
 layout_mode = 2

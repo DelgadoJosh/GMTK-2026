@@ -65,6 +65,12 @@ All of them. At the same time. Forever.
 Three mistakes and you're fired."
 horizontal_alignment = 1
 
+[node name="Veteran" type="CheckButton" parent="Center/Stack"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 15
+text = "Veteran shift -- all four stations from second zero"
+
 [node name="Buttons" type="HBoxContainer" parent="Center/Stack"]
 layout_mode = 2
 theme_override_constants/separation = 12

@@ -27,7 +27,7 @@ station_id = "safe"
 display_name = "Safe Keypad"
 base_duration = 18.0
 floor_duration = 7.0
-unlock_time = 60.0
+unlock_time = 20.0
 grace_duration = 0.0
 lockout_duration = 2.0
 

@@ -32,6 +32,9 @@ func _ready() -> void:
 func show_results(final_time: float, final_score: int, cheated: bool) -> void:
 	visible = true
 	shift_label.text = "SHIFT SURVIVED   " + GameManager.format_clock(final_time)
+	if GameManager.difficulty_mode == GameManager.Difficulty.VETERAN:
+		# Two runs of the same length are not the same run. Say which this was.
+		shift_label.text += "   [VETERAN]"
 	score_label.text = "SERVICE POINTS   %d" % final_score
 	fired_label.text = "You were fired by: %s" % _station_name(GameManager.fired_by)
 

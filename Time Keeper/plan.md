@@ -60,7 +60,7 @@ Four stations, unlocked over time, in a 2×2 grid.
 
 | | |
 |---|---|
-| **Unlocks at** | 25s |
+| **Unlocks at** | 10s |
 | **Interaction** | Click **and hold** the winding key |
 | **Countdown** | Mainspring tension drains 100 → 0 |
 | **Service** | Hold to refill tension |
@@ -76,7 +76,7 @@ Four stations, unlocked over time, in a 2×2 grid.
 
 | | |
 |---|---|
-| **Unlocks at** | 60s |
+| **Unlocks at** | 20s |
 | **Interaction** | **Mouse only** — click digits on a 3×4 keypad |
 | **Countdown** | Vault re-lock timer |
 | **Service** | Press **9, 8, 7, 6, 5, 4, 3, 2, 1, 0** in order |
@@ -95,7 +95,8 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 
 `✱` and `#` do nothing. They exist to fill the grid and, more importantly, to become **hazards once the pad shuffles** — a shuffled dead key sitting where you expected a digit.
 
-- **Wrong key (digit or dead key) is not a mistake.** It flashes red, clears the entry back to 9, and costs you the time you'd already spent. The punishment is time, not a heart.
+- **Wrong key (digit or dead key) is not a mistake.** It flashes red and kills the whole pad for **1s** — the countdown keeps draining through it, so guessing costs strictly more than reading does. The entry so far is **kept**. Wiping nine correct presses for one misclick was the single most resented moment in the game.
+- **Every correct digit adds 5s back to the re-lock timer**, capped at a full one. The safe pays as you go rather than demanding the whole code in one breath.
 - Re-lock timer: **18s** base → **7s** at max.
 - On success the safe swings open, holds, then re-locks and re-arms.
 - LCD strip above the pad shows progress: `9 8 7 6 _ _ _ _ _ _`.
@@ -122,7 +123,7 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 
 | | |
 |---|---|
-| **Unlocks at** | 100s |
+| **Unlocks at** | 40s |
 | **Interaction** | **Keyboard** — click the box to focus, type each word, press **Enter** |
 | **Countdown** | Launch-window timer for the whole sequence |
 | **Service** | Type the full countdown: `ten, nine, … one, we have liftoff` |
@@ -134,6 +135,7 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 - **Submit with Enter** (per decision on Q1). Type the word, hit Enter. Correct → accepted, box clears, ghost advances. Wrong → box shakes and clears, no heart lost, time lost.
 - Because validation happens on Enter rather than per-character, **mid-word typos are allowed** — you can backspace and fix. More forgiving than strict prefix matching, and it makes Enter the deliberate commit beat.
 - **Click to focus** (per decision on Q2). The box does **not** auto-steal focus when a launch window opens; the klaxon and flashing panel tell you, and walking over to click the box is part of the cost. `Esc` or clicking elsewhere releases focus.
+- **Focus is held until you leave, not until you press Enter.** Godot 4.4+ ends a `LineEdit`'s editing state on submit (`keep_editing_on_text_submit`), and closing a window used to hand the caret back to nobody — so one word per click, and another trip to the mouse on every klaxon. The keypad keys are `FOCUS_NONE` for the same reason: servicing the safe must not silently cost you the rocket box.
 - Both of these are explicitly marked for revisit after the first playtest — see §13.1.
 - Launch window: **22s** base for the full 11-word sequence → **13s** at max. Generous alone; brutal while an hourglass is draining.
 - The rocket is **intermittent**. It idles at "no launch scheduled" and a window opens every **35s** base → **18s** at max. A klaxon and flashing panel announce it.
@@ -190,11 +192,19 @@ Every station duration is `lerp(base, floor, difficulty)`. One number to tune, o
 
 | Phase | Time | Active | Feel |
 |---|---|---|---|
-| 1 — Orientation | 0–25s | Hourglass | "This is easy." |
-| 2 — Two hands | 25–60s | + Wind-up clock | "Okay, I have to plan." |
-| 3 — Three-body | 60–100s | + Safe (tier 0) | "Wait—" |
-| 4 — Full shift | 100–240s | + Rocket, safe → tier 1 | Everything, accelerating |
+| 1 — Orientation | 0–10s | Hourglass | "This is easy." |
+| 2 — Two hands | 10–20s | + Wind-up clock | "Okay, I have to plan." |
+| 3 — Three-body | 20–40s | + Safe (tier 0) | "Wait—" |
+| 4 — Full shift | 40–240s | + Rocket, safe → tier 1 | Everything, accelerating |
 | 5 — Overtime | 240s+ | All at floor, safe → tier 2 | Endurance; score is bragging rights |
+
+The original schedule was 25 / 60 / 100s. It reads fine on a first play and badly
+on a tenth: two minutes of a game you already understand before the game starts.
+The unlock ladder was pulled in to 10 / 20 / 40s. The **difficulty ramp is still
+240s** — that is the next dial to turn if the middle now feels flat.
+
+**Veteran** (checkbox on the title card) skips the ladder entirely and opens with
+all four stations live at second zero. Same ramp, no on-ramp.
 
 ### Overtime escalation (stretch)
 
@@ -217,6 +227,8 @@ Second hourglass is **dropped** (per decision on Q7) — the grid stays 2×2.
   - Rocket launched: **100**
 - **Clutch bonus:** ×2 when the service lands while the station is in the critical (red) zone.
 - **Anti-spam:** servicing above 80% remaining awards **0** points and **no Time Dividend** (the timer still resets — it's just not worth anything). Prevents mash-farming the hourglass.
+  - **The safe and the rocket are exempt.** Ten ordered clicks and eleven typed words cannot be mashed, and once correct digits refill the safe's timer a clean fast entry lands with the bar near full — zeroing that punishes exactly the play the rule was written to encourage.
+  - The rule used to be invisible, which made "I serviced it and got nothing" the most confusing thing in the game. It is now stated twice on the panel: the fill bar goes **dark green** and the status line reads **NO POINTS YET**. The wind-up clock reports this whenever the spring is already in the green, since it only pays on the crossing *into* green — which is what makes hovering at the amber edge the high-roller play rather than a bug.
 - **Cheated runs** (§10) are flagged and excluded from high scores.
 - Game-over screen: shift time, points, per-station service counts, dividends earned, and *which station fired you*. That last line is the shareable bit.
 
@@ -503,7 +515,7 @@ which is exactly the part a harness can't judge.
 - [x] `we have liftoff` — internal spaces handled, leading/trailing whitespace tolerated.
 - [x] Enter on an empty box is a no-op, not a wrong answer.
 - [x] Window expires on the final word → mistake, no partial credit.
-- [ ] Focus released on `Esc` and on clicking another panel; keypad clicks don't silently keep box focus.
+- [x] Focus survives `Enter` and survives the window closing; released on `Esc` and on clicking another panel. Keypad clicks don't steal it.
 - [ ] Typing while unfocused does nothing (and doesn't leak to the debug hotkey).
 - [x] Pasting a whole word with Ctrl+V — **blocked**. Pasting `we have liftoff` is not a countdown.
 
