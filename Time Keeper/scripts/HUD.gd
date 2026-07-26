@@ -5,6 +5,7 @@ const HEART_FULL := preload("res://assets/placeholder/heart_full.png")
 const HEART_EMPTY := preload("res://assets/placeholder/heart_empty.png")
 
 var _hearts: Array[TextureRect] = []
+var _dividend_tween: Tween
 
 @onready var shift_label: Label = $Bar/Shift
 @onready var phase_label: Label = $Bar/Phase
@@ -33,6 +34,8 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	shift_label.text = "SHIFT  " + GameManager.format_clock(GameManager.elapsed_time)
 	phase_label.text = GameManager.get_phase_name()
+	if GameManager.difficulty_mode == GameManager.Difficulty.VETERAN:
+		phase_label.text = "VETERAN / " + phase_label.text
 
 
 func _on_run_started() -> void:
@@ -60,12 +63,19 @@ func _refresh_hearts(remaining: int) -> void:
 
 
 func _on_dividend_earned(from_station: String) -> void:
-	# An invisible reward teaches nothing, so the switch is named on screen.
-	dividend_label.text = "SWITCHED!  +TIME  (%s)" % from_station.to_upper()
+	# An invisible reward teaches nothing, so the switch is named on screen --
+	# and it stays up long enough to actually be read while both hands are busy.
+	# The old 0.45s hold was a flicker you noticed only after it had gone.
+	dividend_label.text = "+TIME DIVIDEND -- SWITCHED TO %s" % from_station.to_upper()
+	# Dividends can land every 0.75s and the banner now lives for 2.4s, so the
+	# previous tween is killed rather than raced: an older fade must not drag a
+	# newer message off screen halfway through reading it.
+	if _dividend_tween != null and _dividend_tween.is_valid():
+		_dividend_tween.kill()
 	dividend_label.modulate.a = 1.0
-	var tween := create_tween()
-	tween.tween_interval(0.45)
-	tween.tween_property(dividend_label, "modulate:a", 0.0, 0.35)
+	_dividend_tween = create_tween()
+	_dividend_tween.tween_interval(1.8)
+	_dividend_tween.tween_property(dividend_label, "modulate:a", 0.0, 0.6)
 
 
 static func _commas(value: int) -> String:

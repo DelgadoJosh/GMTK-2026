@@ -86,11 +86,28 @@ func _test_unlocks() -> void:
 	print("\n-- unlocks")
 	check(hourglass.is_unlocked, "hourglass unlocked at 0s")
 	check(not clock.is_unlocked, "clock still locked at 0s")
-	GameManager.elapsed_time = 26.0
+	# The unlock times on the scenes and the phase table in GameManager are two
+	# copies of the same schedule, so check they still agree.
+	check(clock.unlock_time == float(GameManager.PHASES[1]["time"])
+		and safe.unlock_time == float(GameManager.PHASES[2]["time"])
+		and rocket.unlock_time == float(GameManager.PHASES[3]["time"]),
+		"station unlock times match the phase table")
+	GameManager.elapsed_time = clock.unlock_time + 1.0
 	await get_tree().process_frame
-	check(clock.is_unlocked, "clock unlocked past 25s")
+	check(clock.is_unlocked, "clock unlocked past its unlock time")
 	check(clock.time_remaining > clock.get_current_duration() * 0.99,
 		"clock arrives with a full countdown, not an expiring one")
+
+	# Veteran opens with the whole facility live.
+	GameManager.elapsed_time = 0.0
+	GameManager.difficulty_mode = GameManager.Difficulty.VETERAN
+	await get_tree().process_frame
+	check(clock.is_unlocked and safe.is_unlocked and rocket.is_unlocked,
+		"veteran starts with all four stations at 0s")
+	GameManager.difficulty_mode = GameManager.Difficulty.STANDARD
+	await get_tree().process_frame
+	check(not rocket.is_unlocked, "standard puts the rocket back behind the clock")
+
 	GameManager.elapsed_time = 0.0
 	GameManager.debug_unlock_overrides = {
 		"clock": true, "safe": true, "rocket": true}
@@ -241,11 +258,27 @@ func _test_safe() -> void:
 	var keys: Array = safe.get_node("Layout/Stack/Body/Console/Keypad").get_children()
 	check(keys.size() == 12, "12 cells for 10 digits and 2 dead keys")
 
-	var dead_cell: int = safe._cells.find("✱")
+	var dead_cell: int = safe._cells.find("*")
 	var hearts_before := GameManager.hearts
 	safe._on_key_pressed(dead_cell)
 	check(GameManager.hearts == hearts_before, "a dead key costs no heart")
-	check(safe._entry_index == 0, "a dead key clears the entry")
+	check(safe._miskey_freeze > 0.0, "a dead key deadens the pad")
+	var frozen_entry: int = safe._entry_index
+	safe._on_key_pressed(safe._cells.find("9"))
+	check(safe._entry_index == frozen_entry,
+		"presses during the miskey freeze register as nothing")
+	safe._end_miskey_freeze()
+
+	# Each correct digit buys the re-lock countdown back up, capped at full.
+	safe.time_remaining = 4.0
+	safe._on_key_pressed(safe._cells.find("9"))
+	check(safe.time_remaining > 8.99, "a correct digit buys back five seconds")
+	safe.time_remaining = safe.get_current_duration()
+	safe._on_key_pressed(safe._cells.find("8"))
+	check(safe.time_remaining <= safe.get_current_duration() + 0.001,
+		"the refill is capped at a full re-lock timer")
+	safe._on_reset()
+	safe._state = 0
 
 	# Walk the whole descending code. Ten correct digits in a row is ten
 	# progress points from one station, which is one switch and one dividend.
@@ -264,12 +297,16 @@ func _test_safe() -> void:
 		"presses after opening don't restart an entry")
 	check(safe.is_timer_paused, "re-lock timer paused while the door is open")
 
-	# Wrong digit mid-entry.
+	# Wrong digit mid-entry: the entry survives now, the pad goes dead instead.
 	safe._on_reset()
 	safe._state = 0
 	safe._on_key_pressed(safe._cells.find("9"))
+	safe._on_key_pressed(safe._cells.find("8"))
+	var kept: int = safe._entry_index
 	safe._on_key_pressed(safe._cells.find("4"))
-	check(safe._entry_index == 0, "a wrong digit clears the entry back to 9")
+	check(safe._entry_index == kept, "a wrong digit keeps the entry so far")
+	check(safe._miskey_freeze > 0.0, "a wrong digit deadens the pad instead")
+	safe._end_miskey_freeze()
 
 	# Shuffle: input-locked, timer paused, never identical.
 	safe.set_debug_tier(1)
@@ -398,6 +435,23 @@ func _test_scoring() -> void:
 	hourglass.time_remaining = hourglass.get_current_duration() * 0.5
 	awarded = hourglass.service(10)
 	check(awarded == 10, "a normal service pays face value")
+
+	hourglass.time_remaining = hourglass.get_current_duration() * 0.5
+	check(hourglass.is_scoring_possible(), "a half-drained station can pay")
+	hourglass.time_remaining = hourglass.get_current_duration()
+	check(not hourglass.is_scoring_possible(),
+		"a full one-click station reports no points available")
+	check(not clock.is_scoring_possible(),
+		"a fully wound clock reports no points available")
+
+	# The safe and the rocket can't be mashed -- ten ordered clicks and eleven
+	# typed words -- so the anti-spam rule must not zero a fast clean run.
+	for station in [safe, rocket]:
+		station.time_remaining = station.get_current_duration()
+		check(station.service(10, false) == 10,
+			"%s pays in full at a full bar" % station.station_id)
+		check(station.is_scoring_possible(),
+			"%s never claims points are unavailable" % station.station_id)
 
 
 func _test_progression() -> void:

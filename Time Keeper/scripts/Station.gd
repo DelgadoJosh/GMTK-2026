@@ -29,6 +29,9 @@ const FLASH_REMAINING := 0.05
 const THRESHOLD_EPSILON := 0.0005
 
 const COLOR_OK := Color(0.36, 0.75, 0.42)
+## Same hue as COLOR_OK, much darker: the bar is healthy *and* servicing it now
+## is worth nothing. Bright green means "there are points here".
+const COLOR_OK_DIM := Color(0.13, 0.28, 0.16)
 const COLOR_WARN := Color(0.92, 0.68, 0.20)
 const COLOR_CRIT := Color(0.85, 0.24, 0.22)
 const COLOR_LOCKOUT := Color(0.45, 0.45, 0.50)
@@ -188,6 +191,23 @@ func is_critical() -> bool:
 	return get_remaining_fraction() <= CRITICAL_REMAINING
 
 
+## The anti-spam rule exists to stop a one-click station being mashed for
+## points. Stations whose service costs a long, ordered sequence of inputs
+## cannot be farmed that way, and zeroing them for being *fast* punishes exactly
+## the play the rule was written to encourage.
+func is_anti_spam_exempt() -> bool:
+	return false
+
+
+## True when servicing this station *right now* would actually pay out. The
+## anti-spam rule is otherwise invisible, and "I serviced it and got nothing"
+## is the single most confusing thing about the scoring.
+func is_scoring_possible() -> bool:
+	if is_anti_spam_exempt():
+		return true
+	return get_remaining_fraction() <= GameManager.ANTI_SPAM_REMAINING + THRESHOLD_EPSILON
+
+
 func can_interact() -> bool:
 	return is_unlocked and GameManager.is_running and not is_locked_out \
 		and not GameManager.modal_open and not GameManager.is_focus_paused()
@@ -202,7 +222,8 @@ func service(points: int, reset: bool = true) -> int:
 	# The epsilon matters: both thresholds are documented as "exactly at the
 	# threshold still counts", and duration * 0.8 / duration lands a hair above
 	# 0.8 in floating point often enough to make that a lie.
-	var scored := frac <= GameManager.ANTI_SPAM_REMAINING + THRESHOLD_EPSILON
+	var scored := is_anti_spam_exempt() \
+		or frac <= GameManager.ANTI_SPAM_REMAINING + THRESHOLD_EPSILON
 	var awarded := 0
 	if scored:
 		awarded = points
@@ -254,6 +275,8 @@ func _update_visuals() -> void:
 		color = COLOR_CRIT
 	elif frac <= WARNING_REMAINING:
 		color = COLOR_WARN
+	elif not is_scoring_possible():
+		color = COLOR_OK_DIM
 	if not is_locked_out and frac <= FLASH_REMAINING:
 		# Under 5% the bar flashes rather than just sitting red.
 		var blink: float = 0.55 + 0.45 * sin(_pulse_time * 22.0)
@@ -277,12 +300,21 @@ func _update_status() -> void:
 		status_label.text = _lockout_text()
 		status_label.modulate = COLOR_CRIT
 	else:
-		status_label.text = _status_text()
-		status_label.modulate = Color(0.75, 0.78, 0.86)
+		var hint := _scoring_hint()
+		status_label.text = _status_text() + hint
+		status_label.modulate = Color(0.48, 0.55, 0.50) if hint != "" \
+			else Color(0.75, 0.78, 0.86)
 
 
 func _lockout_text() -> String:
 	return "REPAIRING  %.1fs" % maxf(lockout_remaining, 0.0)
+
+
+## Suffix appended to the status line. Spelled out rather than left to the dim
+## bar: the bar teaches the rule once you have noticed it, this is what makes
+## you notice it.
+func _scoring_hint() -> String:
+	return "" if is_scoring_possible() else "   NO POINTS YET"
 
 
 # --- subclass hooks ----------------------------------------------------------

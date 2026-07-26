@@ -22,9 +22,14 @@ var _gag_index: int = 0
 @onready var expansion_label: Label = $Center/Stack/Expansion
 @onready var play_button: Button = $Center/Stack/Buttons/Play
 @onready var quit_button: Button = $Center/Stack/Buttons/Quit
+@onready var veteran_check: CheckButton = $Center/Stack/Veteran
 
 
 func _ready() -> void:
+	# The autoload outlives this scene, so the box remembers the last choice
+	# when you come back to the title after being fired.
+	veteran_check.button_pressed = \
+		GameManager.difficulty_mode == GameManager.Difficulty.VETERAN
 	play_button.pressed.connect(_on_play)
 	quit_button.pressed.connect(func() -> void: get_tree().quit())
 	# Browser builds have no meaningful quit.
@@ -55,4 +60,6 @@ func _run_gag() -> void:
 
 func _on_play() -> void:
 	Sfx.play("click")
+	GameManager.difficulty_mode = GameManager.Difficulty.VETERAN \
+		if veteran_check.button_pressed else GameManager.Difficulty.STANDARD
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")

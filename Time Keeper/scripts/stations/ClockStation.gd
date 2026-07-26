@@ -165,10 +165,25 @@ func _update_gauge() -> void:
 	face.rotation = -get_remaining_fraction() * TAU
 
 
+## The clock pays on the *crossing* into green, so points only exist while the
+## spring is slack. Sitting at 90 tension is safe and worth nothing -- which is
+## the whole reason hovering at the amber edge is the high-roller play.
+func is_scoring_possible() -> bool:
+	return get_remaining_fraction() * 100.0 < GREEN_TENSION
+
+
 func _status_text() -> String:
 	if _winding and get_remaining_fraction() * 100.0 >= OVERWIND_MIN:
 		return "OVERWIND!  %.1fs" % maxf(SNAP_TIME - _overwind_time, 0.0)
 	return "TENSION  %d" % int(get_remaining_fraction() * 100.0)
+
+
+func _scoring_hint() -> String:
+	# Not while the spring is about to snap. "No points yet" is the wrong thing
+	# to be reading in the half second before you lose a heart.
+	if _winding and get_remaining_fraction() * 100.0 >= OVERWIND_MIN:
+		return ""
+	return super._scoring_hint()
 
 
 func _lockout_text() -> String:

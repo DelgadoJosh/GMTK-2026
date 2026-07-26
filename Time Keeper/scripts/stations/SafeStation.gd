@@ -21,6 +21,15 @@ const TIER_ARCANE_AT := 0.66
 const OPEN_HOLD := 1.1
 const SHUFFLE_DURATION := 1.0
 
+## Every correct digit buys the countdown back up, capped at a full re-lock
+## timer. Ten digits is a lot of clicks to fit inside one window, so the safe
+## pays as you go rather than asking for the whole code in one breath.
+const KEY_TIME_BONUS := 5.0
+## A miskey no longer wipes the entry. Instead the pad goes dead for a second,
+## which costs strictly more than reading the keys does -- guessing stays bad
+## without a single slip throwing away nine correct presses.
+const MISKEY_FREEZE := 1.0
+
 const KEY_SCENE := preload("res://scenes/stations/KeypadKey.tscn")
 const SYMBOL_PATH := "res://assets/placeholder/safe_symbol_%s.png"
 
@@ -35,6 +44,10 @@ var _pending_tier: int = 0
 var _debug_tier_override: int = -1
 var _symbols: Dictionary = {}
 var _keys: Array[TextureButton] = []
+## Seconds left on the post-miskey pad lockout. The re-lock countdown keeps
+## draining through it -- freezing that would make guessing a way to buy time.
+var _miskey_freeze: float = 0.0
+var _flash_tween: Tween
 
 @onready var lcd_label: Label = $Layout/Stack/Body/Console/Lcd/Value
 @onready var keypad: GridContainer = $Layout/Stack/Body/Console/Keypad
@@ -106,6 +119,10 @@ func _process(delta: float) -> void:
 	# Crossing a tier threshold mid-entry must not disturb the attempt in
 	# progress; the new tier is picked up at the next re-lock.
 	_pending_tier = get_tier()
+	if _miskey_freeze > 0.0:
+		_miskey_freeze = maxf(_miskey_freeze - GameManager.scaled_delta(delta), 0.0)
+		if _miskey_freeze <= 0.0:
+			_end_miskey_freeze()
 
 
 # --- entry -------------------------------------------------------------------
@@ -113,13 +130,14 @@ func _process(delta: float) -> void:
 func _on_key_pressed(cell: int) -> void:
 	if not can_interact():
 		return
-	# During the shuffle the pad is input-locked: clicks register as nothing at
-	# all, not as wrong presses.
-	if _state != State.ARMED:
+	# During the shuffle -- and during the miskey freeze -- the pad is
+	# input-locked: clicks register as nothing at all, not as wrong presses.
+	if _state != State.ARMED or _miskey_freeze > 0.0:
 		return
 	var value: String = _cells[cell]
 	if value == CODE[_entry_index]:
 		_entry_index += 1
+		time_remaining = minf(time_remaining + KEY_TIME_BONUS, get_current_duration())
 		Sfx.play("keypad_beep", 1.0 + 0.05 * _entry_index)
 		_flash(_keys[cell], COLOR_OK)
 		# Every correct digit is a progress point, which makes the safe the
@@ -133,17 +151,33 @@ func _on_key_pressed(cell: int) -> void:
 
 
 func _wrong(cell: int) -> void:
-	# A wrong key -- digit or dead key -- costs time, never a heart.
-	_entry_index = 0
+	# A wrong key -- digit or dead key -- costs a dead second, never a heart and
+	# no longer the entry so far.
+	_miskey_freeze = MISKEY_FREEZE
 	Sfx.play("keypad_beep", 0.5, -2.0)
-	_flash(_keys[cell], COLOR_CRIT)
+	# A green flash from the previous digit is still fading; left alive it would
+	# hand one key back its white halfway through a dead pad.
+	if _flash_tween != null and _flash_tween.is_valid():
+		_flash_tween.kill()
+	# No tween back to white: the whole pad has to stay visibly dead for the
+	# full second, with the offending key called out in red.
+	for i in _keys.size():
+		_keys[i].modulate = COLOR_CRIT if i == cell else COLOR_LOCKOUT
+	lcd_label.modulate = COLOR_CRIT
 	_refresh_lcd()
+
+
+func _end_miskey_freeze() -> void:
+	_miskey_freeze = 0.0
+	lcd_label.modulate = Color.WHITE
+	if _state == State.ARMED:
+		_refresh_keys()
 
 
 func _flash(key: TextureButton, color: Color) -> void:
 	key.modulate = color
-	var tween := create_tween()
-	tween.tween_property(key, "modulate", Color.WHITE, 0.25)
+	_flash_tween = create_tween()
+	_flash_tween.tween_property(key, "modulate", Color.WHITE, 0.25)
 
 
 func _open() -> void:
@@ -230,6 +264,7 @@ func _rearm() -> void:
 	is_timer_paused = false
 	time_remaining = get_current_duration()
 	_entry_index = 0
+	_end_miskey_freeze()
 	_refresh_keys()
 	_refresh_lcd()
 
@@ -263,6 +298,13 @@ func _refresh_lcd() -> void:
 	lcd_label.text = " ".join(parts)
 
 
+## Ten ordered presses per open, and each one refills the countdown -- so a
+## clean fast entry lands with the bar near full. Under the anti-spam rule that
+## would score nothing, which is backwards.
+func is_anti_spam_exempt() -> bool:
+	return true
+
+
 func _status_text() -> String:
 	match _state:
 		State.OPEN:
@@ -270,6 +312,8 @@ func _status_text() -> String:
 		State.SHUFFLING:
 			return "RE-KEYING..."
 		_:
+			if _miskey_freeze > 0.0:
+				return "MISKEY -- PAD DEAD  %.1fs" % _miskey_freeze
 			return "RE-LOCK  %.1fs   TIER %d" % [maxf(time_remaining, 0.0), _active_tier]
 
 
@@ -278,6 +322,7 @@ func _on_reset() -> void:
 	_state = State.ARMED
 	is_timer_paused = false
 	door.visible = false
+	_end_miskey_freeze()
 	for key in _keys:
 		key.scale = Vector2.ONE
 		key.modulate = Color.WHITE

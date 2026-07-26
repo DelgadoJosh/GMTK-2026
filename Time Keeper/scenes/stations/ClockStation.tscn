@@ -20,7 +20,7 @@ station_id = "clock"
 display_name = "Wind-up Clock"
 base_duration = 20.0
 floor_duration = 8.0
-unlock_time = 25.0
+unlock_time = 10.0
 grace_duration = 0.0
 lockout_duration = 2.0
 

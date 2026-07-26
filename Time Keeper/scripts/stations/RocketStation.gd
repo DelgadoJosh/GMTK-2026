@@ -49,6 +49,10 @@ func _ready() -> void:
 	input.add_theme_color_override("font_uneditable_color", Color.TRANSPARENT)
 	input.add_theme_color_override("caret_color", Color.TRANSPARENT)
 	input.focus_mode = Control.FOCUS_CLICK
+	# Godot 4.4+ ends the LineEdit's editing state on Enter, which reads as
+	# "the box silently stopped listening". One word per click is not a
+	# countdown, so the box holds the caret until you click somewhere else.
+	input.keep_editing_on_text_submit = true
 	flame.visible = false
 	_go_idle(false)
 
@@ -111,8 +115,9 @@ func _go_idle(reset_timer: bool = true) -> void:
 	_is_idle = true
 	_word_index = 0
 	input.text = ""
-	if input.has_focus():
-		input.release_focus()
+	# Focus is deliberately *not* dropped here. A successful launch closing the
+	# window used to hand the caret back to nobody, so the next klaxon meant
+	# another trip to the mouse. Escape, or a click elsewhere, still releases it.
 	if reset_timer:
 		time_remaining = get_current_duration()
 	_stop_klaxon()
@@ -250,6 +255,12 @@ func _process(delta: float) -> void:
 	if _is_idle:
 		# An idle rocket is not an emergency; it must not join the tick ladder.
 		Sfx.clear_urgency(station_id)
+
+
+## Eleven typed words, on a window the station opens itself. There is nothing
+## here to mash.
+func is_anti_spam_exempt() -> bool:
+	return true
 
 
 func _update_visuals() -> void:

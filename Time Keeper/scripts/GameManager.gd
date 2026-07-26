@@ -35,14 +35,20 @@ const CLUTCH_MULTIPLIER := 2
 const STARTING_HEARTS := 3
 const MAX_HEARTS := 3
 
-## Phase boundaries, used by the HUD label and the debug jump buttons.
+## Phase boundaries, used by the HUD label and the debug jump buttons. These
+## have to stay in step with the `unlock_time` on each station scene.
 const PHASES := [
 	{"name": "ORIENTATION", "time": 0.0},
-	{"name": "TWO HANDS", "time": 25.0},
-	{"name": "THREE-BODY", "time": 60.0},
-	{"name": "FULL SHIFT", "time": 100.0},
+	{"name": "TWO HANDS", "time": 10.0},
+	{"name": "THREE-BODY", "time": 20.0},
+	{"name": "FULL SHIFT", "time": 40.0},
 	{"name": "OVERTIME", "time": 240.0},
 ]
+
+## VETERAN opens with all four stations live. Chosen on the title card and
+## sticky across retries, so it is deliberately *not* reset by start_run().
+enum Difficulty { STANDARD, VETERAN }
+var difficulty_mode: int = Difficulty.STANDARD
 
 var hearts: int = STARTING_HEARTS
 var score: int = 0
@@ -201,6 +207,8 @@ func get_stations() -> Array:
 func should_be_unlocked(station_id: String, unlock_time: float) -> bool:
 	if debug_unlock_overrides.has(station_id):
 		return bool(debug_unlock_overrides[station_id])
+	if difficulty_mode == Difficulty.VETERAN:
+		return true
 	return elapsed_time >= unlock_time
 
 
