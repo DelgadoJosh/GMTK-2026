@@ -29,8 +29,9 @@ floor_duration = 13.0
 unlock_time = 40.0
 grace_duration = 0.0
 lockout_duration = 2.0
-idle_base = 35.0
-idle_floor = 18.0
+idle_base = 15.0
+idle_floor = 10.0
+first_idle = 5.0
 
 [node name="Background" type="NinePatchRect" parent="."]
 layout_mode = 2

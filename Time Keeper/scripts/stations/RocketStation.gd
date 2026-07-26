@@ -16,8 +16,13 @@ const WORDS := [
 
 ## The launch window is the Station countdown (base_duration/floor_duration).
 ## The idle gap between windows is its own ramp.
-@export var idle_base: float = 35.0
-@export var idle_floor: float = 18.0
+@export var idle_base: float = 15.0
+@export var idle_floor: float = 10.0
+## The gap before the *first* window only. A station that slams in demanding
+## attention and then does nothing for a full idle gap reads as broken, and it
+## wastes the one moment the rest of the facility is calm enough to learn a new
+## klaxon in.
+@export var first_idle: float = 5.0
 
 const COLOR_TYPED := "#e8ecf4"
 const COLOR_TYPO := "#e8946a"
@@ -291,3 +296,10 @@ func _lockout_text() -> String:
 
 func _on_reset() -> void:
 	_go_idle(false)
+
+
+func _on_unlocked() -> void:
+	# Runs after _on_reset(), which leaves the station idle on a full gap.
+	# Overwrite it: the first klaxon should land while you are still looking at
+	# the panel that just appeared.
+	time_remaining = first_idle

@@ -353,6 +353,13 @@ func _test_rocket_and_console() -> void:
 			egg_seen[0] = true)
 
 	check(rocket._is_idle, "rocket starts idle with no launch scheduled")
+	# A frame has already drained a little, so this is a window rather than an
+	# equality -- it only has to distinguish 5s from a 15s idle gap.
+	check(rocket.time_remaining <= rocket.first_idle
+		and rocket.time_remaining > rocket.first_idle - 1.0,
+		"the first launch window is the short one, not a full idle gap")
+	check(rocket.first_idle < rocket.idle_floor,
+		"the first gap is shorter than any later one, at any difficulty")
 	rocket._on_submitted("  Easter Egg  ")
 	check(egg_seen[0], "console words work while idle, case and space insensitive")
 
@@ -485,10 +492,16 @@ func _test_progression() -> void:
 	check(hourglass.is_unlocked and clock.is_unlocked and safe.is_unlocked
 		and rocket.is_unlocked, "jump to phase 5 unlocks everything")
 	var sane := true
-	for station in [hourglass, clock, safe, rocket]:
+	for station in [hourglass, clock, safe]:
 		if station.time_remaining < station.get_current_duration() * 0.9:
 			sane = false
 	check(sane, "jump to phase 5 leaves sane starting timers")
+	# The rocket is the deliberate exception. It arrives idle on the short first
+	# gap, and an idle countdown hitting zero opens a window rather than costing
+	# a heart -- so "arrives nearly expired" isn't a hazard here the way it is
+	# for the three stations that can actually fail.
+	check(rocket._is_idle and rocket.time_remaining <= rocket.first_idle,
+		"the rocket arrives idle on its short first gap, which cannot fail")
 
 	# A large delta (5x time scale, or a browser tab hitching) overshoots zero
 	# by a lot. The expiry test is a threshold, not an equality, so a station

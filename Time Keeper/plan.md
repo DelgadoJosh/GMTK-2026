@@ -140,7 +140,9 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 - **Every accepted word adds 5s back to the launch window**, capped at a full one — the same bargain the safe keypad makes, and the same shared `Station.PROGRESS_TIME_BONUS`. Both stations ask for a long ordered sequence, so both pay as you go rather than demanding the whole thing inside one countdown.
   - The bonus is **not** applied to the word that launches (nor to the digit that opens the vault). `service()` grades the clutch bonus on the countdown as it stood, and a refill an instant before scoring would erase a genuine last-second save.
 - Launch window: **22s** base for the full 11-word sequence → **13s** at max. Generous alone; brutal while an hourglass is draining.
-- The rocket is **intermittent**. It idles at "no launch scheduled" and a window opens every **35s** base → **18s** at max. A klaxon and flashing panel announce it.
+- The rocket is **intermittent**. It idles at "no launch scheduled" and a window opens every **15s** base → **10s** at max. A klaxon and flashing panel announce it.
+  - The **first** window after unlock comes after **5s**, not a full gap. A station that slams in demanding attention and then does nothing for half a minute reads as broken, and it wastes the one moment the rest of the facility is calm enough to learn a new klaxon in.
+  - This was 35s → 18s. Combined with the 22s window it meant the rocket was idle more often than not; it is now live roughly 60% of the time, which is a real step up in load. If the late game becomes rocket-shaped, this is the dial.
 - On success: rocket tweens up off the top of the panel, bonus score, back to idle.
 
 **Why mouse/keyboard are split:** the keypad is pointer-driven and the rocket is keyboard-driven, so late-game you're using both hands on different problems and cannot batch them. It also sidesteps the focus collision where pressing `7` for the safe types a `7` into the rocket box.
