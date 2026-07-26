@@ -13,6 +13,11 @@ signal failed(station_id: String)
 
 @export var station_id: String = ""
 @export var display_name: String = ""
+## One-line tutorial shown beside the title, for the whole run rather than just
+## the first few seconds. Four stations each wanting a different verb is the
+## thing new players lose, and by the time it matters they are too busy to go
+## back to the rules screen.
+@export var hint: String = ""
 @export var base_duration: float = 14.0
 @export var floor_duration: float = 5.0
 @export var unlock_time: float = 0.0
@@ -53,7 +58,8 @@ var _pulse_time: float = 0.0
 # the urgency bar and the locked board. Only `Body` differs per station.
 @onready var background: NinePatchRect = $Background
 @onready var layout: MarginContainer = $Layout
-@onready var title_label: Label = $Layout/Stack/Title
+@onready var title_label: Label = $Layout/Stack/TitleRow/Title
+@onready var hint_label: Label = $Layout/Stack/TitleRow/Hint
 @onready var body: Control = $Layout/Stack/Body
 @onready var status_label: Label = $Layout/Stack/Status
 @onready var bar: ProgressBar = $Layout/Stack/Bar
@@ -64,6 +70,7 @@ func _ready() -> void:
 	GameManager.register_station(self)
 	GameManager.run_started.connect(reset_for_run)
 	title_label.text = display_name.to_upper()
+	hint_label.text = hint
 	# The urgency bar is the one visual that stays a themed control rather than
 	# a swappable texture: it has to read identically on all four stations.
 	_bar_fill = StyleBoxFlat.new()

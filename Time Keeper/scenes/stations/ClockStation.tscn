@@ -18,6 +18,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_shell")
 script = ExtResource("1_script")
 station_id = "clock"
 display_name = "Wind-up Clock"
+hint = "Click and hold to wind"
 base_duration = 20.0
 floor_duration = 8.0
 unlock_time = 10.0
@@ -46,11 +47,24 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="Title" type="Label" parent="Layout/Stack"]
+[node name="TitleRow" type="HBoxContainer" parent="Layout/Stack"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Layout/Stack/TitleRow"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_font_sizes/font_size = 16
 text = "WIND-UP CLOCK"
+
+[node name="Hint" type="Label" parent="Layout/Stack/TitleRow"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.64, 1)
+theme_override_font_sizes/font_size = 12
+text = "Click and hold to wind"
 
 [node name="Body" type="Control" parent="Layout/Stack"]
 layout_mode = 2

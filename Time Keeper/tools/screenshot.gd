@@ -22,9 +22,13 @@ func _ready() -> void:
 	GameManager.add_score(1240)
 	GameManager.hearts = 2
 	GameManager.mistake_made.emit(2)
-	# One frame so the unlock overrides land before the per-station setup,
-	# which unlocking would otherwise reset.
-	await get_tree().process_frame
+	# Frames so the unlock overrides land before the per-station setup, which
+	# unlocking would otherwise reset. `process_frame` fires before nodes get
+	# their `_process`, so one await is not one full frame of station logic --
+	# with only one, the keypad presses below arrive at a station that is still
+	# locked, get dropped by can_interact(), and then the unlock wipes the entry.
+	for _i in 3:
+		await get_tree().process_frame
 	var safe = GameManager.get_station("safe")
 	safe.set_debug_tier(1)
 	safe._rearm()

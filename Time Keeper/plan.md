@@ -269,6 +269,7 @@ Second hourglass is **dropped** (per decision on Q7) — the grid stays 2×2.
 
 - Plain 2×2 `GridContainer`, **1280×720**, `canvas_items` stretch, `expand` aspect. Safe for itch embeds.
 - Locked stations show a boarded panel reading `NOT YOUR PROBLEM (YET)`. Unlocking slams in with a shake + stamp.
+- **Every panel carries a one-line tutorial beside its name** (`Station.hint`, set per scene): *Click to flip* · *Click and hold to wind* · *Press numbers from 9 to 0* · *Type each word, press Enter*. Four stations each wanting a different verb is the thing new players lose, and by the time it matters they are too busy to go back to the rules screen — so the hint stays up for the whole run rather than fading after the first few seconds. It replaces the one-off instruction that used to sit under the rocket's input box; the same information in the same place on all four reads as a system rather than as one station being chatty.
 - **Every panel carries a fill bar in the same place** (bottom edge) with the same colors: green → amber at 25% → red at 10% → flashing under 5%. Uniform readability is what makes the multitasking fair, whatever the art ends up being.
 - Audio urgency ladder: each critical station adds a distinct looping tick. Four overlapping ticks is genuine panic and tells you the board state without looking.
 
