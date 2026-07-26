@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wcbigr45mbpy"
-path="res://.godot/imported/launchpad.png-fa927efbe90627584bb3e985a01bde3d.ctex"
+uid="uid://dflwyipk5xdnw"
+path="res://.godot/imported/clock_face.png-4878c6118c865db34176d67c2bbcc9c9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/placeholder/launchpad.png"
-dest_files=["res://.godot/imported/launchpad.png-fa927efbe90627584bb3e985a01bde3d.ctex"]
+source_file="res://assets/audio/clock_face.png"
+dest_files=["res://.godot/imported/clock_face.png-4878c6118c865db34176d67c2bbcc9c9.ctex"]
 
 [params]
 
