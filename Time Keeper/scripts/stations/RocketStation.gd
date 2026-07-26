@@ -180,8 +180,12 @@ func _accept_word() -> void:
 	Sfx.play("keypad_beep", 1.0 + 0.04 * _word_index, -4.0)
 	note_progress(true)
 	if _word_index >= WORDS.size():
+		# Not on the word that launches: service() grades the clutch bonus on
+		# the window as it stood, and a refill an instant before scoring would
+		# erase a genuine save.
 		_launch()
 	else:
+		grant_time_bonus()
 		_refresh_ghost()
 
 

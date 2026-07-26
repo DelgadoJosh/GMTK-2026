@@ -21,10 +21,6 @@ const TIER_ARCANE_AT := 0.66
 const OPEN_HOLD := 1.1
 const SHUFFLE_DURATION := 1.0
 
-## Every correct digit buys the countdown back up, capped at a full re-lock
-## timer. Ten digits is a lot of clicks to fit inside one window, so the safe
-## pays as you go rather than asking for the whole code in one breath.
-const KEY_TIME_BONUS := 5.0
 ## A miskey no longer wipes the entry. Instead the pad goes dead for a second,
 ## which costs strictly more than reading the keys does -- guessing stays bad
 ## without a single slip throwing away nine correct presses.
@@ -137,7 +133,6 @@ func _on_key_pressed(cell: int) -> void:
 	var value: String = _cells[cell]
 	if value == CODE[_entry_index]:
 		_entry_index += 1
-		time_remaining = minf(time_remaining + KEY_TIME_BONUS, get_current_duration())
 		Sfx.play("keypad_beep", 1.0 + 0.05 * _entry_index)
 		_flash(_keys[cell], COLOR_OK)
 		# Every correct digit is a progress point, which makes the safe the
@@ -145,7 +140,12 @@ func _on_key_pressed(cell: int) -> void:
 		note_progress(true)
 		_refresh_lcd()
 		if _entry_index >= CODE.size():
+			# Not on the digit that opens the vault: service() grades the clutch
+			# bonus on the timer as it stood, and a refill an instant before
+			# scoring would erase a genuine save.
 			_open()
+		else:
+			grant_time_bonus()
 	else:
 		_wrong(cell)
 

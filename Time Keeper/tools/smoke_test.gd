@@ -376,12 +376,28 @@ func _test_rocket_and_console() -> void:
 	main.get_node("DialogLayer/EasterEggDialog").close()
 	check(not GameManager.modal_open, "closing the dialog resumes the shift")
 
+	rocket.time_remaining = 4.0
 	rocket._on_submitted("TEN")
 	check(rocket._word_index == 1, "correct word advances, case insensitive")
+	check(rocket.time_remaining > 8.99, "an accepted word buys back five seconds")
+	rocket.time_remaining = rocket.get_current_duration()
+	rocket._on_submitted("nine")
+	check(rocket.time_remaining <= rocket.get_current_duration() + 0.001,
+		"the refill is capped at a full launch window")
 
-	for i in range(1, 10):
+	for i in range(2, 10):
 		rocket._on_submitted(rocket.WORDS[i])
-	check(rocket._word_index == 10, "nine more words accepted")
+	check(rocket._word_index == 10, "the rest of the words are accepted")
+	# The launching word must not refill first -- service() grades the clutch
+	# bonus on the window as it stood.
+	rocket.time_remaining = rocket.get_current_duration() * 0.05
+	var score_before := GameManager.score
+	rocket._on_submitted("  we have liftoff  ")
+	check(GameManager.score - score_before == rocket.POINTS * GameManager.CLUTCH_MULTIPLIER,
+		"a last-second launch still pays the clutch bonus")
+	rocket._go_idle()
+	rocket._open_window()
+	rocket._word_index = 10
 	rocket._on_submitted("  we have liftoff  ")
 	check(rocket._is_idle and rocket._word_index == 0,
 		"'we have liftoff' launches; internal spaces and padding tolerated")

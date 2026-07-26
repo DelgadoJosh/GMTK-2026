@@ -96,7 +96,7 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 `✱` and `#` do nothing. They exist to fill the grid and, more importantly, to become **hazards once the pad shuffles** — a shuffled dead key sitting where you expected a digit.
 
 - **Wrong key (digit or dead key) is not a mistake.** It flashes red and kills the whole pad for **1s** — the countdown keeps draining through it, so guessing costs strictly more than reading does. The entry so far is **kept**. Wiping nine correct presses for one misclick was the single most resented moment in the game.
-- **Every correct digit adds 5s back to the re-lock timer**, capped at a full one. The safe pays as you go rather than demanding the whole code in one breath.
+- **Every correct digit adds 5s back to the re-lock timer**, capped at a full one (`Station.PROGRESS_TIME_BONUS`, shared with the rocket). The safe pays as you go rather than demanding the whole code in one breath. Not applied to the digit that opens the vault — see the rocket's note on why.
 - Re-lock timer: **18s** base → **7s** at max.
 - On success the safe swings open, holds, then re-locks and re-arms.
 - LCD strip above the pad shows progress: `9 8 7 6 _ _ _ _ _ _`.
@@ -137,6 +137,8 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 - **Click to focus** (per decision on Q2). The box does **not** auto-steal focus when a launch window opens; the klaxon and flashing panel tell you, and walking over to click the box is part of the cost. `Esc` or clicking elsewhere releases focus.
 - **Focus is held until you leave, not until you press Enter.** Godot 4.4+ ends a `LineEdit`'s editing state on submit (`keep_editing_on_text_submit`), and closing a window used to hand the caret back to nobody — so one word per click, and another trip to the mouse on every klaxon. The keypad keys are `FOCUS_NONE` for the same reason: servicing the safe must not silently cost you the rocket box.
 - Both of these are explicitly marked for revisit after the first playtest — see §13.1.
+- **Every accepted word adds 5s back to the launch window**, capped at a full one — the same bargain the safe keypad makes, and the same shared `Station.PROGRESS_TIME_BONUS`. Both stations ask for a long ordered sequence, so both pay as you go rather than demanding the whole thing inside one countdown.
+  - The bonus is **not** applied to the word that launches (nor to the digit that opens the vault). `service()` grades the clutch bonus on the countdown as it stood, and a refill an instant before scoring would erase a genuine last-second save.
 - Launch window: **22s** base for the full 11-word sequence → **13s** at max. Generous alone; brutal while an hourglass is draining.
 - The rocket is **intermittent**. It idles at "no launch scheduled" and a window opens every **35s** base → **18s** at max. A klaxon and flashing panel announce it.
 - On success: rocket tweens up off the top of the panel, bonus score, back to idle.

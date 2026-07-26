@@ -21,6 +21,9 @@ signal failed(station_id: String)
 ## Post-failure grace so a drained station can't burn every heart in a second.
 @export var lockout_duration: float = 2.0
 
+## Seconds bought back per correct partial input. See grant_time_bonus().
+const PROGRESS_TIME_BONUS := 5.0
+
 const WARNING_REMAINING := 0.25
 const CRITICAL_REMAINING := 0.10
 const FLASH_REMAINING := 0.05
@@ -214,6 +217,16 @@ func can_interact() -> bool:
 
 
 # --- service / failure -------------------------------------------------------
+
+## Credit one partial-progress input with time back on the clock, capped at a
+## full countdown. Stations whose service is a long ordered sequence -- ten
+## keypad digits, eleven typed words -- pay as you go rather than demanding the
+## whole thing inside a single window. Shared so the two stay in step: tuning
+## one of them without the other is almost never what you meant.
+func grant_time_bonus() -> void:
+	time_remaining = minf(time_remaining + PROGRESS_TIME_BONUS,
+		get_current_duration())
+
 
 ## Award points for a successful service and file the progress point.
 ## Returns the points actually awarded, after anti-spam and the clutch bonus.
