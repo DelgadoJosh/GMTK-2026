@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://cmlr4ili6b2cv"]
 
-[ext_resource type="Script" path="res://scripts/Credits.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b6oj0aoi5x73n" path="res://scripts/Credits.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrim"]
 bg_color = Color(0.02, 0.02, 0.03, 0.88)
@@ -19,7 +19,6 @@ corner_radius_bottom_left = 8
 
 [node name="Credits" type="PanelContainer"]
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -27,6 +26,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_scrim")
 script = ExtResource("1_script")
+audio_attribution = "Game_over.wav by deleted_user_877451 -- https://freesound.org/s/76376/ -- License: Attribution 3.0
+
+"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
