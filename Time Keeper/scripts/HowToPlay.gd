@@ -47,14 +47,15 @@ func _build() -> String:
 		+ " is always the descending count, so there is nothing to memorise — the"
 		+ " difficulty is in [i]finding[/i] the digits.")
 	out.append(("Every correct digit adds [color=%s]%ds[/color] back to the"
-		+ " re-lock timer.") % [GREEN, int(Station.PROGRESS_TIME_BONUS)])
+		+ " re-lock timer.") % [GREEN, int(SAFE.KEY_TIME_BONUS)])
 	out.append(("A wrong key — including the dead * and # keys — costs no heart"
 		+ " and does [i]not[/i] wipe the digits you already got. It kills the pad"
 		+ " for %ds while the timer keeps running, so guessing is still a bad"
 		+ " idea.") % int(SAFE.MISKEY_FREEZE))
-	out.append(("[color=%s]Later in the shift the keys shuffle position on every"
-		+ " re-lock, and later still they turn into symbols with a codex to read"
-		+ " off.[/color]") % DIM)
+	out.append(("[color=%s]The vault escalates as you crack it, not as the clock"
+		+ " runs: after your first opening the keys shuffle position on every"
+		+ " re-lock, and after %d openings they turn into symbols with a codex to"
+		+ " read off.[/color]") % [DIM, SAFE.TIER_ARCANE_AFTER])
 
 	out.append(_station("ROCKET LAUNCH", "keyboard", ROCKET.POINTS))
 	out.append("Launch windows open on their own schedule — a klaxon and a"

@@ -218,13 +218,19 @@ func can_interact() -> bool:
 
 # --- service / failure -------------------------------------------------------
 
+## Seconds bought back per correct partial input. Overridable: the safe and the
+## rocket both want the mechanic, but hunting for a shuffled digit and typing a
+## word you can already read are not the same amount of work.
+func get_time_bonus() -> float:
+	return PROGRESS_TIME_BONUS
+
+
 ## Credit one partial-progress input with time back on the clock, capped at a
 ## full countdown. Stations whose service is a long ordered sequence -- ten
 ## keypad digits, eleven typed words -- pay as you go rather than demanding the
-## whole thing inside a single window. Shared so the two stay in step: tuning
-## one of them without the other is almost never what you meant.
+## whole thing inside a single window.
 func grant_time_bonus() -> void:
-	time_remaining = minf(time_remaining + PROGRESS_TIME_BONUS,
+	time_remaining = minf(time_remaining + get_time_bonus(),
 		get_current_duration())
 
 

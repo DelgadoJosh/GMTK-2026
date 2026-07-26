@@ -15,12 +15,19 @@ const DEFAULT_CELLS := ["1", "2", "3", "4", "5", "6", "7", "8", "9",
 	"*", "0", "#"]
 const DEAD_KEYS := ["*", "#"]
 
-const TIER_SHUFFLE_AT := 0.33
-const TIER_ARCANE_AT := 0.66
+## Tiers escalate on vaults opened, not on the shift clock. Tying them to
+## difficulty meant a player who ignored the safe never saw it change and a
+## player who worked it hard still waited on the clock -- either way the station
+## spent most of its life showing you the easy version of itself.
+const TIER_SHUFFLE_AFTER := 1
+const TIER_ARCANE_AFTER := 3
 
 const OPEN_HOLD := 1.1
 const SHUFFLE_DURATION := 1.0
 
+## Seconds bought back per correct digit. Higher than the shared default the
+## rocket uses -- see get_time_bonus().
+const KEY_TIME_BONUS := 10.0
 ## A miskey no longer wipes the entry. Instead the pad goes dead for a second,
 ## which costs strictly more than reading the keys does -- guessing stays bad
 ## without a single slip throwing away nine correct presses.
@@ -40,6 +47,9 @@ var _pending_tier: int = 0
 var _debug_tier_override: int = -1
 var _symbols: Dictionary = {}
 var _keys: Array[TextureButton] = []
+## Vaults opened this run. Drives the tier, so it resets per run and survives
+## everything else -- a lockout must not hand back the easy keypad.
+var _completions: int = 0
 ## Seconds left on the post-miskey pad lockout. The re-lock countdown keeps
 ## draining through it -- freezing that would make guessing a way to buy time.
 var _miskey_freeze: float = 0.0
@@ -95,10 +105,9 @@ func _build_codex() -> void:
 func get_tier() -> int:
 	if _debug_tier_override >= 0:
 		return _debug_tier_override
-	var difficulty := GameManager.get_difficulty()
-	if difficulty >= TIER_ARCANE_AT:
+	if _completions >= TIER_ARCANE_AFTER:
 		return 2
-	if difficulty >= TIER_SHUFFLE_AT:
+	if _completions >= TIER_SHUFFLE_AFTER:
 		return 1
 	return 0
 
@@ -182,6 +191,11 @@ func _flash(key: TextureButton, color: Color) -> void:
 
 func _open() -> void:
 	_state = State.OPEN
+	_completions += 1
+	# Recomputed here rather than waiting on _process: _begin_relock() reads
+	# _pending_tier to decide whether to shuffle, and the very first completion
+	# is exactly the one that has to turn shuffling on.
+	_pending_tier = get_tier()
 	is_timer_paused = true
 	Sfx.play("safe_open")
 	service(POINTS)
@@ -303,6 +317,19 @@ func _refresh_lcd() -> void:
 ## would score nothing, which is backwards.
 func is_anti_spam_exempt() -> bool:
 	return true
+
+
+## Twice the shared default. Ten presses is the longest sequence in the game and
+## the only one asking you to hunt for each input rather than already know it.
+func get_time_bonus() -> float:
+	return KEY_TIME_BONUS
+
+
+## Tiers are per-run progress, so this is the one place they clear. Deliberately
+## not _on_reset(), which also fires for a lockout and for a phase jump.
+func reset_for_run() -> void:
+	_completions = 0
+	super.reset_for_run()
 
 
 func _status_text() -> String:

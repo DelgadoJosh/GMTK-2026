@@ -15,6 +15,16 @@ const SOUNDS := [
 	"click",
 ]
 
+## Per-sound trim, applied on top of whatever the caller asks for. Mixing lives
+## here rather than at the call sites: how loud a sound sits against the rest is
+## a property of the file, so a swapped-in replacement gets rebalanced in one
+## place instead of everywhere it is played.
+const MIX_DB := {
+	# A klaxon that makes you flinch stops being information and starts being a
+	# reason to mute the tab.
+	"klaxon": -12.0,
+}
+
 ## Tick pitch per station, low to high in unlock order.
 const TICK_PITCH := {
 	"hourglass": 0.75,
@@ -60,7 +70,7 @@ func play(sound: String, pitch: float = 1.0, volume_db: float = 0.0) -> void:
 	_next_voice = (_next_voice + 1) % POOL_SIZE
 	p.stream = _streams[sound]
 	p.pitch_scale = pitch
-	p.volume_db = volume_db
+	p.volume_db = volume_db + float(MIX_DB.get(sound, 0.0))
 	p.play()
 
 

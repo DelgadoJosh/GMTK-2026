@@ -1,7 +1,7 @@
 extends Control
-## Title card. The acronym gag spells both expansions out letter by letter --
-## the joke does double duty, since the theme is countdown and every failure
-## state is a countdown hitting zero.
+## Title card. The gag assembles each expansion a word at a time and then drops
+## the acronym it spells -- the words are the setup, the acronym is the
+## punchline, so it lands last.
 ##
 ## The Play button also doubles as the first user gesture, which is what
 ## unblocks audio in a browser.
@@ -13,8 +13,11 @@ const GAG := [
 			+ "who's a Joyfully Amazing Maintainer"},
 ]
 
-const LETTER_DELAY := 0.09
-const HOLD := 1.1
+const WORD_DELAY := 0.18
+## A beat of silence between the last word and the acronym. Without it the
+## payoff arrives on top of the setup and reads as one event.
+const ACRONYM_DELAY := 0.45
+const HOLD := 2.0
 
 var _gag_index: int = 0
 
@@ -55,21 +58,40 @@ func _wire_panel(button: Button, panel: InfoPanel) -> void:
 func _run_gag() -> void:
 	while is_inside_tree():
 		var entry: Dictionary = GAG[_gag_index]
-		var acronym: String = entry["acronym"]
 		acronym_label.text = ""
 		expansion_label.text = ""
-		for i in acronym.length():
-			acronym_label.text += acronym[i]
-			if acronym[i] != " ":
-				Sfx.play("keypad_beep", 1.4, -18.0)
-			await get_tree().create_timer(LETTER_DELAY).timeout
+		for prefix in word_prefixes(str(entry["expansion"])):
+			expansion_label.text = prefix
+			Sfx.play("keypad_beep", 1.4, -18.0)
+			await get_tree().create_timer(WORD_DELAY).timeout
 			if not is_inside_tree():
 				return
-		expansion_label.text = str(entry["expansion"])
+		await get_tree().create_timer(ACRONYM_DELAY).timeout
+		if not is_inside_tree():
+			return
+		acronym_label.text = str(entry["acronym"])
+		Sfx.play("keypad_beep", 1.9, -14.0)
 		await get_tree().create_timer(HOLD).timeout
 		if not is_inside_tree():
 			return
 		_gag_index = (_gag_index + 1) % GAG.size()
+
+
+## Progressive prefixes of `text`, one per whitespace-delimited word, ending on
+## the whole string. Newlines count as boundaries, so the second gag's line
+## break arrives with the word after it rather than hanging on its own.
+static func word_prefixes(text: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	for i in range(1, text.length()):
+		var is_break: bool = text[i] == " " or text[i] == "\n"
+		var after_break: bool = text[i - 1] == " " or text[i - 1] == "\n"
+		# The second guard keeps a run of whitespace from emitting the same
+		# prefix twice, which would read as a dropped frame.
+		if is_break and not after_break:
+			out.append(text.substr(0, i))
+	if text != "":
+		out.append(text)
+	return out
 
 
 func _on_play() -> void:

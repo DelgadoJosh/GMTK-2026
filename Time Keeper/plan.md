@@ -18,7 +18,9 @@ The job: keep every countdown in the facility from reaching zero. All of them. A
 
 **Goal:** survive as long as possible. Three mistakes and you're fired.
 
-The joke does double duty — the theme is "countdown," and every failure state *is* a countdown hitting zero. The title card can spell out both acronyms letter-by-letter as an intro gag.
+The joke does double duty — the theme is "countdown," and every failure state *is* a countdown hitting zero.
+
+The title card runs both expansions as an intro gag: the words assemble **one at a time**, then the acronym they spell lands after a beat, and the whole thing holds for 2s before switching. Words-then-acronym rather than the reverse, because the acronym is the punchline — showing it first gives the joke away and leaves the words as an explanation.
 
 ---
 
@@ -96,18 +98,20 @@ The code is never arbitrary — it is *always* the descending count 9→0. That 
 `✱` and `#` do nothing. They exist to fill the grid and, more importantly, to become **hazards once the pad shuffles** — a shuffled dead key sitting where you expected a digit.
 
 - **Wrong key (digit or dead key) is not a mistake.** It flashes red and kills the whole pad for **1s** — the countdown keeps draining through it, so guessing costs strictly more than reading does. The entry so far is **kept**. Wiping nine correct presses for one misclick was the single most resented moment in the game.
-- **Every correct digit adds 5s back to the re-lock timer**, capped at a full one (`Station.PROGRESS_TIME_BONUS`, shared with the rocket). The safe pays as you go rather than demanding the whole code in one breath. Not applied to the digit that opens the vault — see the rocket's note on why.
-- Re-lock timer: **18s** base → **7s** at max.
+- **Every correct digit adds 10s back to the re-lock timer**, capped at a full one (`SafeStation.KEY_TIME_BONUS`). Twice what the rocket gets from `Station.PROGRESS_TIME_BONUS`: ten presses is the longest sequence in the game and the only one that makes you *hunt* for each input rather than already know it. Not applied to the digit that opens the vault — see the rocket's note on why.
+- Re-lock timer: **24s** base → **11s** at max.
 - On success the safe swings open, holds, then re-locks and re-arms.
 - LCD strip above the pad shows progress: `9 8 7 6 _ _ _ _ _ _`.
 
 **Difficulty tiers:**
 
-| Tier | Difficulty | Behavior |
+Tiers escalate on **vaults opened**, not on the shift clock. Keying them to difficulty meant a player who ignored the safe never saw it change, while a player working it hard still waited on the clock — either way the station spent most of its life showing you the easy version of itself.
+
+| Tier | Opens | Behavior |
 |---|---|---|
-| **0 — Standard** | `< 0.33` | Normal phone layout, fixed. Becomes muscle memory fast, which is the point — it's the "free" station until it isn't. |
-| **1 — Shuffled** | `0.33 – 0.66` | Digits randomly reassigned to the 12 cells on every re-lock. |
-| **2 — Arcane** *(stretch)* | `0.66 +` | Digits replaced by symbols; a codex panel shows the symbol→digit key. Re-rolls on shuffle. |
+| **0 — Standard** | first vault | Normal phone layout, fixed. Becomes muscle memory fast, which is the point — it's the "free" station until it isn't. |
+| **1 — Shuffled** | after **1** | Digits randomly reassigned to the 12 cells on every re-lock. |
+| **2 — Arcane** | after **3** | Digits replaced by symbols; a codex panel shows the symbol→digit key. Re-rolls on shuffle. |
 
 **Shuffle rules (anti-bamboozle):**
 
@@ -449,6 +453,7 @@ Jam rules require assets made during the jam, so swapping must be mechanical.
   ```
 - One bitmap/pixel font everywhere, swapped once.
 - Audio, same swap-by-filename rule: `tick`, `flip`, `wind`, `snap`, `keypad_beep`, `keypad_shuffle`, `safe_open`, `launch`, `dividend`, `mistake`, `fired`.
+- **Per-sound trim lives in `Sfx.MIX_DB`**, not at the call sites. How loud a sound sits against the rest is a property of the file, so a swapped-in replacement gets rebalanced in one place instead of everywhere it is played. The klaxon runs at **−12dB**: one that makes you flinch stops being information and starts being a reason to mute the tab.
 
 ---
 

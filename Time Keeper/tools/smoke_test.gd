@@ -44,6 +44,7 @@ func _ready() -> void:
 	await _test_clock()
 	await _test_how_to_play()
 	await _test_credits()
+	_test_title_gag()
 
 	print("")
 	print("%d checks, %d failures" % [_checks, _failures])
@@ -274,7 +275,10 @@ func _test_safe() -> void:
 	# Each correct digit buys the re-lock countdown back up, capped at full.
 	safe.time_remaining = 4.0
 	safe._on_key_pressed(safe._cells.find("9"))
-	check(safe.time_remaining > 8.99, "a correct digit buys back five seconds")
+	check(safe.time_remaining > 4.0 + safe.KEY_TIME_BONUS - 0.01,
+		"a correct digit buys back the safe's own bonus")
+	check(safe.KEY_TIME_BONUS > Station.PROGRESS_TIME_BONUS,
+		"the safe's bonus is the more generous of the two, not the shared one")
 	safe.time_remaining = safe.get_current_duration()
 	safe._on_key_pressed(safe._cells.find("8"))
 	check(safe.time_remaining <= safe.get_current_duration() + 0.001,
@@ -298,6 +302,28 @@ func _test_safe() -> void:
 	check(safe._entry_index == entry_after_open,
 		"presses after opening don't restart an entry")
 	check(safe.is_timer_paused, "re-lock timer paused while the door is open")
+
+	# Tiers escalate on vaults opened, not on the shift clock.
+	check(safe._completions == 1 and safe.get_tier() == 1,
+		"the first opening turns shuffling on")
+	safe._completions = safe.TIER_ARCANE_AFTER - 1
+	check(safe.get_tier() == 1, "one short of arcane the pad is still shuffling")
+	safe._completions = safe.TIER_ARCANE_AFTER
+	check(safe.get_tier() == 2, "the third opening turns the glyphs on")
+	# A lockout resets a lot of state; the tier must not be part of it, or
+	# dropping a vault would hand back an easier keypad as a reward.
+	safe.begin_lockout(0.1)
+	check(safe._completions == safe.TIER_ARCANE_AFTER,
+		"a lockout does not hand back an easier keypad")
+	safe.is_locked_out = false
+	safe.lockout_remaining = 0.0
+
+	GameManager.start_run()
+	GameManager.debug_unlock_overrides = {
+		"clock": true, "safe": true, "rocket": true}
+	await get_tree().process_frame
+	check(safe._completions == 0 and safe.get_tier() == 0,
+		"a new run hands back the plain keypad")
 
 	# Wrong digit mid-entry: the entry survives now, the pad goes dead instead.
 	safe._on_reset()
@@ -486,7 +512,8 @@ func _test_progression() -> void:
 	await get_tree().process_frame
 	check(is_equal_approx(hourglass.get_current_duration(), hourglass.floor_duration),
 		"difficulty override reaches the duration calc")
-	check(safe.get_tier() == 2, "difficulty override reaches the safe tier")
+	check(is_equal_approx(safe.get_current_duration(), safe.floor_duration),
+		"difficulty override reaches every station's duration")
 	GameManager.debug_difficulty_override = -1.0
 
 	GameManager.jump_to_phase(4)
@@ -647,3 +674,33 @@ func _test_credits() -> void:
 
 	panel.queue_free()
 	await get_tree().process_frame
+
+
+func _test_title_gag() -> void:
+	print("\n-- title card")
+	var menu := preload("res://scripts/MainMenu.gd")
+	var steps: PackedStringArray = menu.word_prefixes("Grand Maestro of Time")
+	check(steps.size() == 4, "one reveal step per word")
+	check(steps[0] == "Grand" and steps[3] == "Grand Maestro of Time",
+		"steps run from the first word to the whole line")
+
+	# The second gag has a line break in it. A newline is a word boundary, and a
+	# run of whitespace must not emit the same prefix twice -- a repeated step
+	# reads on screen as a dropped frame rather than as a word.
+	var wrapped: PackedStringArray = menu.word_prefixes("one two\nthree  four")
+	check(wrapped.size() == 4, "newlines and double spaces are single boundaries")
+	var duplicated := false
+	for i in range(1, wrapped.size()):
+		if wrapped[i] == wrapped[i - 1]:
+			duplicated = true
+	check(not duplicated, "no step repeats the previous one")
+	check(menu.word_prefixes("").is_empty(), "an empty line reveals nothing")
+
+	# Every expansion has to survive the splitter intact, or the title card
+	# quietly drops the end of a joke.
+	var intact := true
+	for entry in menu.GAG:
+		var prefixes: PackedStringArray = menu.word_prefixes(str(entry["expansion"]))
+		if prefixes.is_empty() or prefixes[prefixes.size() - 1] != str(entry["expansion"]):
+			intact = false
+	check(intact, "every gag ends on its complete expansion")
