@@ -60,7 +60,9 @@ Winchester 1873, cock and dry fire.wav by SpliceSound -- https://freesound.org/s
 
 playing_cards.aif by KevinHilt -- https://freesound.org/s/196541/ -- License: Creative Commons 0
 
-cardshuffler.wav by j1987 -- https://freesound.org/s/123005/ -- License: Creative Commons 0"
+cardshuffler.wav by j1987 -- https://freesound.org/s/123005/ -- License: Creative Commons 0
+
+Btw, thanks for reading the credits! Type in \"easter egg\" into the rocket launch textbox! Also try typing in \"cheat\" ;P"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2

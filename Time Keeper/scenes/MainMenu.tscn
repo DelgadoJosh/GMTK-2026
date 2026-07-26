@@ -1,9 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=6 format=3 uid="uid://drjpe7awek24k"]
 
-[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_frame.png" id="2_frame"]
+[ext_resource type="Script" uid="uid://dsagjqxpfwui7" path="res://scripts/MainMenu.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b25vxsvsvyoj6" path="res://assets/placeholder/hourglass_frame.png" id="2_frame"]
 [ext_resource type="PackedScene" path="res://scenes/HowToPlay.tscn" id="3_howto"]
-[ext_resource type="PackedScene" path="res://scenes/Credits.tscn" id="4_credits"]
+[ext_resource type="PackedScene" uid="uid://cmlr4ili6b2cv" path="res://scenes/Credits.tscn" id="4_credits"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.06, 0.07, 0.09, 1)
@@ -68,7 +68,7 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 15
-text = "Veteran shift -- all four stations from second zero"
+text = "\"I'VE PLAYED THESE GAMES BEFORE\": Start with all 4 stations unlocked"
 
 [node name="Buttons" type="HBoxContainer" parent="Center/Stack"]
 layout_mode = 2
@@ -103,9 +103,7 @@ text = "Debug panel: ` or F1"
 horizontal_alignment = 1
 
 [node name="HowToPlay" parent="." instance=ExtResource("3_howto")]
-visible = false
 layout_mode = 2
 
 [node name="Credits" parent="." instance=ExtResource("4_credits")]
-visible = false
 layout_mode = 2
