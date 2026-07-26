@@ -28,11 +28,11 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_scrim")
 script = ExtResource("1_script")
 audio_attribution = "Game_over.wav by deleted_user_877451 -- https://freesound.org/s/76376/ -- License: Attribution 3.0
 
-grandfather clock antique crank wind mechanism up1.flac by kyles -- https://freesound.org/s/635573/ -- License: Creative Commons 0
-
 Clock Wind.wav by adeluc4 -- https://freesound.org/s/125320/ -- License: Creative Commons 0
 
-Click menu by SLV443 -- https://freesound.org/s/733769/ -- License: Creative Commons 0"
+Click menu by SLV443 -- https://freesound.org/s/733769/ -- License: Creative Commons 0
+
+Nokia Keypad Beep.wav by edinc90 -- https://freesound.org/s/268917/ -- License: Attribution 4.0"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 2
