@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/placeholder/hourglass_frame.png" id="2_frame"]
+[ext_resource type="PackedScene" path="res://scenes/HowToPlay.tscn" id="3_howto"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.06, 0.07, 0.09, 1)
@@ -81,6 +82,11 @@ custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 text = "Clock in"
 
+[node name="HowTo" type="Button" parent="Center/Stack/Buttons"]
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+text = "How to play"
+
 [node name="Quit" type="Button" parent="Center/Stack/Buttons"]
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
@@ -92,3 +98,7 @@ theme_override_colors/font_color = Color(0.4, 0.44, 0.52, 1)
 theme_override_font_sizes/font_size = 12
 text = "Debug panel: ` or F1"
 horizontal_alignment = 1
+
+[node name="HowToPlay" parent="." instance=ExtResource("3_howto")]
+visible = false
+layout_mode = 2

@@ -23,9 +23,14 @@ var _gag_index: int = 0
 @onready var play_button: Button = $Center/Stack/Buttons/Play
 @onready var quit_button: Button = $Center/Stack/Buttons/Quit
 @onready var veteran_check: CheckButton = $Center/Stack/Veteran
+@onready var howto_button: Button = $Center/Stack/Buttons/HowTo
+@onready var howto_panel: Control = $HowToPlay
 
 
 func _ready() -> void:
+	howto_button.pressed.connect(func() -> void:
+		Sfx.play("click")
+		howto_panel.open())
 	# The autoload outlives this scene, so the box remembers the last choice
 	# when you come back to the title after being fired.
 	veteran_check.button_pressed = \

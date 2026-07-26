@@ -42,6 +42,7 @@ func _ready() -> void:
 	await _test_scoring()
 	await _test_progression()
 	await _test_clock()
+	await _test_how_to_play()
 
 	print("")
 	print("%d checks, %d failures" % [_checks, _failures])
@@ -585,3 +586,37 @@ func _test_clock() -> void:
 class SafeStationCode:
 	static func code_of(safe_station) -> Array:
 		return safe_station.CODE
+
+
+func _test_how_to_play() -> void:
+	print("\n-- how to play")
+	var panel: Node = load("res://scenes/HowToPlay.tscn").instantiate()
+	get_tree().root.add_child(panel)
+	await get_tree().process_frame
+	var text: String = panel.get_node("Center/Panel/Margin/Stack/Scroll/Body").text
+	check(text.length() > 1500, "the rules panel builds a body")
+
+	# The panel reads every number off the constant that drives it so it cannot
+	# drift out of date. That only holds if the substitutions actually happen --
+	# in GDScript `%` binds tighter than `+`, so a concatenated format string
+	# without parentheses silently applies its arguments to the wrong fragment.
+	var leftovers := ""
+	for token in ["%d", "%s", "%.1f"]:
+		if text.contains(token):
+			leftovers += token + " "
+	check(leftovers == "", "every format placeholder was substituted")
+
+	var missing := ""
+	for station in [hourglass, clock, safe, rocket]:
+		if not text.contains("%d points" % station.POINTS):
+			missing += station.station_id + " "
+	check(missing == "", "every station's point value reached the page")
+	check(text.contains("×%d" % GameManager.CLUTCH_MULTIPLIER),
+		"the clutch multiplier reached the page")
+	check(text.contains("%d%%" % int(GameManager.ANTI_SPAM_REMAINING * 100.0)),
+		"the anti-spam threshold reached the page")
+	check(text.contains("%ds" % int(Station.PROGRESS_TIME_BONUS)),
+		"the time bonus reached the page")
+
+	panel.queue_free()
+	await get_tree().process_frame

@@ -268,6 +268,14 @@ Second hourglass is **dropped** (per decision on Q7) — the grid stays 2×2.
 - **Every panel carries a fill bar in the same place** (bottom edge) with the same colors: green → amber at 25% → red at 10% → flashing under 5%. Uniform readability is what makes the multitasking fair, whatever the art ends up being.
 - Audio urgency ladder: each critical station adds a distinct looping tick. Four overlapping ticks is genuine panic and tells you the board state without looking.
 
+### Title card
+
+`Clock in` · `How to play` · `Clock out`, plus the **Veteran** checkbox.
+
+`How to play` opens a scrolling rules panel (`scenes/HowToPlay.tscn`) covering all four stations with the input device each one wants, the point value of each, the clutch and anti-spam rules, and what the Time Dividend is and why switching is the reward.
+
+Its numbers are **read off the constants that drive them** — `HourglassStation.POINTS`, `ClockStation.OVERWIND_MIN`, `GameManager.CLUTCH_MULTIPLIER`, `Station.PROGRESS_TIME_BONUS` and so on — rather than typed in. A help screen that quietly disagrees with the game after a balance pass is worse than no help screen. The smoke test asserts every placeholder actually substituted, because GDScript binds `%` tighter than `+` and a concatenated format string without parentheses fails silently.
+
 **Deferred:** the "diorama" layout — hourglass large in the bottom-left foreground, other stations receding into the background — is a real improvement to make once the game is proven fun. Build the grid first; a `GridContainer` swapped for anchored positions is a contained change as long as each station scene stays self-contained and doesn't assume its size.
 
 ---
