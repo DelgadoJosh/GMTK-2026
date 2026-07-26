@@ -36,14 +36,27 @@ assets land — they overwrite by filename and will wipe finished work.
 
 ### Rules for all art
 
-- **Transparent RGBA PNG.** Placeholders are authored at ~2× their on-screen
-  size; keep that headroom.
+- **Transparent RGBA PNG**, authored at ~2× its on-screen size. Note the
+  placeholders do not all hit that: `clock_key`, `clock_gauge`, `safe_lcd`,
+  `safe_keypad_key` and `rocket_flame` are undersized or the wrong aspect for
+  their slot. Where that's true the row below gives a corrected authoring size
+  in bold — use it rather than matching the placeholder.
 - **Texture filtering is off project-wide** (`default_texture_filter=0`,
   nearest). Pixel art is happy. Smooth/painted art gets crunchy edges when
   scaled — author at or above the largest size it is drawn at.
 - Viewport is **1280×720**, `canvas_items` stretch, `expand` aspect. Each
-  station panel is roughly **624×319** at that resolution, and the game is
+  station panel is exactly **624×319** at that resolution, and the game is
   played in a browser, so read-at-a-glance beats detail.
+- **The art slot is not the panel.** 624×319 is the outer frame; inside it the
+  title, status caption and fill bar eat the rest, leaving a `Body` of exactly
+  **596×228** — the same on all four stations. That is the box station art is
+  laid out in. Measure against 596×228, not 624×319.
+- **596×228 is 2.6:1, and most station art is `STRETCH_KEEP_ASPECT_CENTERED`.**
+  Aspect-kept art in the body is therefore *height*-bound: a square or portrait
+  texture lands at ~228px tall and much narrower than the panel, centred, with
+  empty space either side. It does not matter how wide you author it. The
+  "Drawn as" column below gives the real on-screen pixels for each asset —
+  design to those, and treat the file size as authoring headroom only.
 - Current placeholder palette lives at the top of `tools/gen_placeholders.py`
   (brass / steel / glass / sand / LCD green / red). Agree on a palette before
   the first real asset lands, or the four stations will not look like one
@@ -60,8 +73,8 @@ done first.
 
 | ☐ | File | Size | Drawn as | Notes | Owner |
 |---|---|---|---|---|---|
-| ☐ | `panel_bg.png` | 96×96 | 9-patch, 24px margins | ⚠ Margins are set in every station scene, `HUD.tscn` and `RocketStation.tscn`'s console frame. Keep a 96×96 / 24px-border layout or five scenes need editing. Highest-impact asset in the game — it's the station frame, the HUD bar and the rocket console. | |
-| ☐ | `panel_locked.png` | 96×96 | 9-patch, 24px margins | Same margin rule. This is the boarded-up "NOT YOUR PROBLEM (YET)" cover over locked stations; the label is drawn on top so leave the middle readable. | |
+| ☐ | `panel_bg.png` | 96×96 | 9-patch, 24px margins — stretched to 624×319 as a station frame, 1256×46 as the HUD bar, and 387×48 as the rocket console field | ⚠ Margins are set in every station scene, `HUD.tscn` and `RocketStation.tscn`'s console frame. Keep a 96×96 / 24px-border layout or five scenes need editing. Highest-impact asset in the game — it's the station frame, the HUD bar and the rocket console. | |
+| ☐ | `panel_locked.png` | 96×96 | 9-patch, 24px margins — stretched to 624×319 | Same margin rule. This is the boarded-up "NOT YOUR PROBLEM (YET)" cover over locked stations; the label is drawn on top so leave the middle readable. | |
 | ☐ | `vignette.png` | 256×144 | Stretched full-screen, **tinted at runtime** | Must be **white with an alpha falloff** — it gets modulated red for a mistake and pale blue for a Time Dividend (`Main.tscn` → `Overlays`). Centre must stay fully transparent. Colour baked into the file will fight the tint. | |
 | ☐ | `heart_full.png` | 64×64 | HUD, drawn at 26×26, aspect-kept | Scales up 1.6× on the lose-a-heart pop (`HUD.gd`), so it needs to hold at ~42px too. | |
 | ☐ | `heart_empty.png` | 64×64 | HUD, drawn at 26×26 | Must read as *spent*, not as a second full heart, at 26px. | |
@@ -70,8 +83,8 @@ done first.
 
 | ☐ | File | Size | Drawn as | Notes | Owner |
 |---|---|---|---|---|---|
-| ☐ | `hourglass_frame.png` | 440×520 | Aspect-kept, fills the panel body | ⚠ **This one is a mask, not just a picture.** The plate is opaque and the two bulbs are punched *transparent*; the sand quad is drawn behind it and shaped by the holes. Bulb rects are `TOP_BULB = (48, 44, 344, 216)` and `BOTTOM_BULB = (48, 260, 344, 216)`, duplicated in `scripts/stations/HourglassStation.gd` and `tools/gen_placeholders.py`. Change the geometry → update both. | |
-| ☐ | `hourglass_sand.png` | 400×400 | Stretched to the drained height | A plain fill swatch, not a shape. It gets squashed to an arbitrary rectangle every frame, so texture it flat/tileable — anything with a silhouette will smear. | |
+| ☐ | `hourglass_frame.png` | 440×520 | Aspect-kept, drawn **193×228** — fills the body's height, ~32% of its width, centred | ⚠ **This one is a mask, not just a picture.** The plate is opaque and the two bulbs are punched *transparent*; the sand quad is drawn behind it and shaped by the holes. Bulb rects are `TOP_BULB = (48, 44, 344, 216)` and `BOTTOM_BULB = (48, 260, 344, 216)`, duplicated in `scripts/stations/HourglassStation.gd` and `tools/gen_placeholders.py`. Change the geometry → update both. | |
+| ☐ | `hourglass_sand.png` | 400×400 | Stretched into a chamber ~151px wide by up to 95px tall | A plain fill swatch, not a shape. It gets squashed to an arbitrary rectangle every frame, so texture it flat/tileable — anything with a silhouette will smear. | |
 
 Also note: the whole glass Control **rotates 180°** over 0.25s on a flip, so
 the frame should look right upside down (the placeholder is symmetric on
@@ -81,27 +94,27 @@ purpose).
 
 | ☐ | File | Size | Drawn as | Notes | Owner |
 |---|---|---|---|---|---|
-| ☐ | `clock_face.png` | 480×480 | Aspect-kept, left ~42% of the body | ⚠ **The entire texture rotates** a full turn as the countdown drains (`face.rotation = -fraction * TAU`). Hands are baked into the face; there is no separate hand node. Either keep it a spinning dial, or split it into face + hand — which is a scene change, so raise it first. | |
-| ☐ | `clock_key.png` | 160×160 | Aspect-kept, right ~36% of the body | Spins around its own centre while held (~1.4 turns/sec), so keep it **centred in its canvas** and visually obvious as a grab target — it's the click-and-hold hotspot. | |
-| ☐ | `clock_gauge.png` | 520×120 | Stretched (not aspect-kept) | Bezel only. The tension bar, the red overwind band and its edge line are themed `ProgressBar`/`ColorRect` chrome drawn inside a 10px/9px inset — plan §11 keeps fill bars as UI. Do **not** paint a bar or a red band into the texture; the band position is computed from `OVERWIND_MIN`. | |
+| ☐ | `clock_face.png` | 480×480 | Aspect-kept in a 250×155 box on the left ~42% of the body, so drawn **155×155** | ⚠ **The entire texture rotates** a full turn as the countdown drains (`face.rotation = -fraction * TAU`). Hands are baked into the face; there is no separate hand node. Either keep it a spinning dial, or split it into face + hand — which is a scene change, so raise it first. | |
+| ☐ | `clock_key.png` | 160×160 (author **256×256**) | Aspect-kept in a 215×128 box on the right ~36% of the body, so drawn **128×128** | Spins around its own centre while held (~1.4 turns/sec), so keep it **centred in its canvas** and visually obvious as a grab target — it's the click-and-hold hotspot. ⚠ The 160×160 placeholder is only 1.25× its on-screen size, short of the 2× rule above — author the real one at 256×256. | |
+| ☐ | `clock_gauge.png` | 520×120 (author **1120×118**) | Stretched (not aspect-kept) to **560×59** | ⚠ The slot is 9.5:1 but the placeholder is 4.3:1, so it gets squashed to 46% of its authored height — even borders come out half as thick top/bottom as left/right. Author at the slot's aspect (2× = 1120×118) and it lands undistorted. Bezel only. The tension bar, the red overwind band and its edge line are themed `ProgressBar`/`ColorRect` chrome drawn inside a 10px/9px inset — plan §11 keeps fill bars as UI. Do **not** paint a bar or a red band into the texture; the band position is computed from `OVERWIND_MIN`. | |
 
 ## 4. Safe station
 
 | ☐ | File | Size | Drawn as | Notes | Owner |
 |---|---|---|---|---|---|
-| ☐ | `safe_door.png` | 600×600 | Aspect-kept, covers the whole body | Only visible during the "cracked it" flash — fades in and out over ~0.6s. It's a celebration frame, so it can carry more detail than the always-on art. | |
-| ☐ | `safe_keypad_key.png` | 140×140 | `TextureButton` normal texture, min 46×40 | 12 of them in a grid. Only `texture_normal` is wired — hover/pressed art would need `KeypadKey.tscn` edited. Digit label or symbol is drawn on top, so keep the centre clear. Feedback flash tints the button, so the base should be neutral enough to tint. | |
-| ☐ | `safe_lcd.png` | 600×100 | Stretched, min height 26 | Readout background. The entered code is a `Label` on top — keep contrast high and don't bake in segments. | |
-| ☐ | `safe_symbol_0.png` … `safe_symbol_9.png` (10 files) | 96×96 | Aspect-kept on keys and in the codex | ⚠ Loaded by pattern `safe_symbol_%s.png` — all ten must exist. Arcane glyphs for tier 2: each must be **unmistakable from the other nine at ~40px**, and meaningless enough that the player has to consult the codex. Drawn at two sizes (key face and codex row) — check both. | |
-| ☐ | `codex_page.png` | 400×600 | `StyleBoxTexture`, 12px texture margins | ⚠ 12px margin is set in `SafeStation.tscn`. It's the paper the symbol→digit legend is printed on, in a narrow strip down the right ~31% of the panel. Symbols and digit labels are drawn over it in two columns. | |
+| ☐ | `safe_door.png` | 600×600 | Aspect-kept over the body, so drawn **228×228** — ~38% of the body width, centred | Only visible during the "cracked it" flash — fades in and out over ~0.6s. It's a celebration frame, so it can carry more detail than the always-on art. | |
+| ☐ | `safe_keypad_key.png` | 140×140 (author **256×92**) | `TextureButton` normal texture, aspect-kept, drawn **46×46** | ⚠ The button cell is **128×46** — wide and short — but the square placeholder aspect-fits to 46×46 and covers only ~36% of it, so the clickable area is much bigger than the art. Author at the cell's 2.8:1 (2× = 256×92) to fill the key. 12 of them in a grid. Only `texture_normal` is wired — hover/pressed art would need `KeypadKey.tscn` edited. Digit label or symbol is drawn on top, so keep the centre clear. Feedback flash tints the button, so the base should be neutral enough to tint. | |
+| ☐ | `safe_lcd.png` | 600×100 (author **786×52**) | Stretched (not aspect-kept) to **393×26** | ⚠ The slot is 15:1 but the placeholder is 6:1, so it squashes to 26% of its authored height. Author at the slot's aspect (2× = 786×52). Readout background. The entered code is a `Label` on top — keep contrast high and don't bake in segments. | |
+| ☐ | `safe_symbol_0.png` … `safe_symbol_9.png` (10 files) | 96×96 | Aspect-kept, **34×34** on the key face and **22×22** in the codex | ⚠ Loaded by pattern `safe_symbol_%s.png` — all ten must exist. Arcane glyphs for tier 2: each must be **unmistakable from the other nine at 22px** — smaller than it sounds, so this is a silhouette job, not a detail job — and meaningless enough that the player has to consult the codex. Check both sizes. | |
+| ☐ | `codex_page.png` | 400×600 | `StyleBoxTexture`, 12px texture margins, stretched over **185×278** | ⚠ 12px margin is set in `SafeStation.tscn`. It's the paper the symbol→digit legend is printed on, in a narrow strip down the right ~31% of the panel. Symbols and digit labels are drawn over it in two columns. | |
 
 ## 5. Rocket station
 
 | ☐ | File | Size | Drawn as | Notes | Owner |
 |---|---|---|---|---|---|
 | ☐ | `rocket_body.png` | 120×320 | Aspect-kept, 60×120 box on the pad | Slides up and off-screen on launch. Nose points up; the flame anchors under its tail. | |
-| ☐ | `rocket_flame.png` | 100×140 | Anchored under the rocket, 0.92–1.45 of its height | Hidden until launch. Single static frame — no animation player, so it either reads as a plume in one image or stays abstract. | |
-| ☐ | `launchpad.png` | 400×80 | Aspect-kept, bottom ~22% of the body | Static. The rocket sits on it and leaves it behind. | |
+| ☐ | `rocket_flame.png` | 100×140 (author **54×128**) | Anchored under the rocket over a 26×64 slot (0.92–1.45 of its height), aspect-kept so drawn **26×37** | ⚠ The slot is 0.41:1 but the placeholder is 0.71:1, so the flame only reaches ~58% down it and the bottom of the slot sits empty. Author tall and narrow (2× = 54×128) to use the full plume length. Hidden until launch. Single static frame — no animation player, so it either reads as a plume in one image or stays abstract. | |
+| ☐ | `launchpad.png` | 400×80 | Aspect-kept in a 183×50 box on the bottom ~22% of the body, so drawn **183×37** | Static. The rocket sits on it and leaves it behind. | |
 
 The rocket's console frame reuses `panel_bg.png` and flashes red six times
 when a launch window opens, so whatever you do to `panel_bg` has to survive
@@ -203,7 +216,7 @@ and scripts. This is the full map.
 |---|---|---|---|---|
 | ☐ | `scenes/MainMenu.tscn` | Title, the one-paragraph pitch, "Clock in" / "Clock out", the debug hint | The pitch line is the only place the game explains itself. ⚠ Keep it short enough to not push the buttons off a 1280×720 layout. | |
 | ☐ | `scripts/MainMenu.gd` → `GAG` | The GMTK / GAME JAM acronym gag that types itself out letter by letter | Two entries today. ⚠ Each letter costs `LETTER_DELAY` (0.09s) plus a `HOLD` of 1.1s, so a long acronym stalls the menu — and the expansion is drawn on one label, so watch the line breaks. Best spot in the game for more jokes; add entries, don't replace the mechanic. | |
-| ☐ | `scenes/stations/*.tscn` | Station titles (`HOURGLASS`, `WIND-UP CLOCK`, `SAFE KEYPAD`, `ROCKET LAUNCH`), gauge captions (`SAND`, `TENSION`), `RE-LOCK`, the rocket's `Click the box, type the word, press Enter.` | ⚠ These sit inside the panel body — a longer title will clip at ~624×319 per station. Check all four at once in the layout screenshot. | |
+| ☐ | `scenes/stations/*.tscn` | Station titles (`HOURGLASS`, `WIND-UP CLOCK`, `SAFE KEYPAD`, `ROCKET LAUNCH`), gauge captions (`SAND`, `TENSION`), `RE-LOCK`, the rocket's `Click the box, type the word, press Enter.` | ⚠ These sit inside the panel body — they get 596px of width per station, and a longer one clips. Check all four at once in the layout screenshot. | |
 | ☐ | `scenes/stations/*.tscn` | `NOT YOUR PROBLEM (YET)` — the locked-station cover, 3 copies | ⚠ Drawn over `panel_locked.png`; change it in all three scenes or the stations disagree with each other. | |
 | ☐ | `scripts/stations/RocketStation.gd` → `WORDS` | The launch countdown the player types: `ten … one`, `we have liftoff` | ⚠ **Gameplay, not flavour.** These get typed under time pressure — keep them short, unambiguous, and easy to spell. `next_label` upper-cases them. Length changes difficulty. | |
 | ☐ | `scripts/stations/RocketStation.gd` | Console status lines: `NO LAUNCH SCHEDULED`, `standing by`, `standing by  (click to focus)`, `SAY: %s   (%d/%d)` | ⚠ BBCode with baked colour constants (`COLOR_TYPED` etc.) — edit the words, leave the tags. | |
